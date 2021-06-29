@@ -19,7 +19,11 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
-    "sphinx_toolbox.more_autodoc.autonamedtuple",
+    # better namedtuple support in sphinx_toolbox
+    "sphinx.ext.viewcode",
+    "sphinx_tabs.tabs",
+    "sphinx-prompt",
+    "sphinx_toolbox",
 ]
 
 # Uncomment the below if you use native CircuitPython modules such as
