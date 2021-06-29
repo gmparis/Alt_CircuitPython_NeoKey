@@ -19,6 +19,7 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx_toolbox.more_autodoc.autonamedtuple",
 ]
 
 # Uncomment the below if you use native CircuitPython modules such as

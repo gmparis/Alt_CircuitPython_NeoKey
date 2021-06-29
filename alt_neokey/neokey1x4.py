@@ -54,17 +54,10 @@ _NEOKEY1X4_KEYS = (_NEOKEY1X4_KEY0, _NEOKEY1X4_KEY1, _NEOKEY1X4_KEY2, _NEOKEY1X4
 _NEOKEY1X4_COUNT = const(4)
 
 NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
-"""Class for event list elements. Implemented as a namedtuple,
-    so properties can be referred to by name or index.
+"""Event list element.
 
-.. py:property:: key_num
-
-    Key number. 0-3 on first NeoKey1x4, 4-7 on second, etc.
-
-.. py:property:: pressed
-
-    True for key press event; False for key release event.
-"""
+    :param int key_num: Key number. 0-3 on first NeoKey1x4, 4-7 on second, etc.
+    :param bool pressed: True for key press event; False for key release event."""
 
 # pylint: disable=missing-docstring
 
