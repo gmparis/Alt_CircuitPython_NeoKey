@@ -123,7 +123,7 @@ class NeoKey1x4:
     argument, a NeoKeyEvent.
 
     Similarly, to have read_keys run arbitrary code whenever a key is pressed,
-    use the NeoKey14 constructor's auto_action parameter. Any return value
+    use the NeoKey1x4 constructor's auto_action parameter. Any return value
     from the function will be ignored. As with auto_color, it will be passed
     a single NeoKeyEvent argument.
 
@@ -139,7 +139,7 @@ class NeoKey1x4:
         import board
         from alt_neokey.neokey1x4 import NeoKey1x4
         i2c = board.I2C()
-        neokey = NeoKey14(
+        neokey = NeoKey1x4(
             i2c,
             auto_colors=lambda e: 0xFFFFFF if e.pressed else 0
         )
