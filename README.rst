@@ -52,7 +52,7 @@ following command to install:
 
 .. code-block:: shell
 
-    circup install neokey
+    circup install alt_neokey
 
 Or the following command to update an existing version:
 
