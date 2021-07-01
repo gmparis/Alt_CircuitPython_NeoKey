@@ -75,12 +75,26 @@ NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
 
 
 class NeoKey_Key:
-    """A single key+pixel pairing. One instance is created by NeoKey1x4
-    for each key. Keys are numbered 0-3 on the first NeoKey1x4. 4-7 on the second, etc.
+    """A single key+pixel pairing.
 
     :param ~Seesaw.seesaw seesaw: NeoKey1x4 Seesaw
     :param ~Seesaw.neopixel pixel: NeoKey1x4 NeoPixel
-    :param int key_num: key number assigned by NeoKey1x4"""
+    :param int key_num: key number assigned by NeoKey1x4
+
+    One NeoKey_Key instance is created by NeoKey1x4 for each key.
+    Keys are numbered 0-3 on the first NeoKey1x4. 4-7 on the second, etc.
+
+    These instances can be referenced by indexing the NeoKey1x4
+    object, as shown here.
+
+    .. sourcecode:: python
+
+        neokey = NeoKey1x4(i2c)
+        neokey[0].color = 0xFF0000 # set color
+        neokey[1].blink = True # turn on blinking
+        key = neokey[2] # reference a NeoKey_Key instance
+        print(key.pressed) # True while the key is pressed
+    """
 
     __slots__ = ("_seesaw", "_pixel", "_key_num", "_blink")
 
@@ -95,15 +109,16 @@ class NeoKey_Key:
     @property
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
-        Returns True if the key is being pressed.
-        Has no effect on auto_colors or auto_action status."""
+        Read-only property is True if the key is being pressed.
+        Does not invoke or otherwise affect auto_colors or auto_action."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
 
     @property
     def color(self):
-        """Key's pixel color. Reads and writes are done over the I2C bus."""
+        """Read-write property representing the Key's pixel color.
+        Reads and writes are done over the I2C bus."""
         return self._pixel[self._key_num]
 
     @color.setter
@@ -112,7 +127,7 @@ class NeoKey_Key:
 
     @property
     def blink(self):
-        """True if key blinks when not pressed"""
+        """Read-write property, True when Key is blinking."""
         return self._blink
 
     @blink.setter
@@ -176,6 +191,13 @@ class NeoKey1x4:
     The blink feature requires time.monotonic_ns, which is not available
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a RuntimeError exception.
+
+    NOTE: The auto_colors function, if defined, is used to initialize
+    key colors. It is also used with blink mode to establish the
+    'on' color in the on/off cycle. For predictable results, the auto_colors
+    function should be re-entrant and without side effects. In contrast,
+    the auto_action function can be relied upon to be called only on
+    key press and key release events.
 
     Any time spent doing anything other than reading keys can detract from
     the responsiveness of the keys. It's probably a good idea to have keys
