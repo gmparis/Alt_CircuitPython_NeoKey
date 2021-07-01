@@ -17,7 +17,7 @@ key_colors = (0x0000FF, 0xFF0000, 0x00FF00, 0xFF6600)
 color_index = 0
 
 
-def my_colors(event):
+def my_colors(event):  # pylint: disable=redefined-outer-name
     """Next color each time a key is pressed"""
     global color_index, key_colors  # pylint: disable=global-statement
     if event.pressed:

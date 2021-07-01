@@ -24,3 +24,12 @@ Enable automatic actions on your devices with action test.
 .. literalinclude:: ../examples/alt_neokey_actiontest.py
     :caption: examples/alt_neokey_actiontest.py
     :linenos:
+
+Blink test
+-----------
+
+Enable automatic blinking on select keys.
+
+.. literalinclude:: ../examples/alt_neokey_blinktest.py
+    :caption: examples/alt_neokey_blinktest.py
+    :linenos:
