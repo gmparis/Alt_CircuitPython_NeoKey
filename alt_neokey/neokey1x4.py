@@ -68,7 +68,7 @@ _NEOKEY1X4_COUNT = const(4)
 NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
 """Event list element.
 
-    :param int key_num: Key number. 0-3 on first NeoKey1x4, 4-7 on second, etc.
+    :param int key_num: key number. 0-3 on first NeoKey1x4, 4-7 on second, etc.
     :param bool pressed: True for key press event; False for key release event."""
 
 # pylint: disable=missing-docstring
@@ -101,10 +101,29 @@ class NeoKey_Key:
     def __init__(self, seesaw, pixel, key_num, *, blink=False):
         self._seesaw = seesaw
         self._pixel = pixel
-        self._key_num = key_num
+        self._key_num = int(key_num)
         if blink:
             _blink_check()  # to exception if necessary
-        self._blink = blink
+        self._blink = bool(blink)
+
+    def __lt__(self, other):
+        # this is here for sorting of NeoKey_Keys (hmmm...)
+        # Key nums are unique for a single NeoKey1x4 instance,
+        # but could somebody have two? That's why _seesaw is here.
+        return (self._key_num, self._seesaw) < (other._key_num, other._seesaw)
+
+    def __eq__(self, other):
+        # this is here so keys can be put in a set used as a dict key
+        return (self._key_num, self._seesaw) == (other._key_num, other._seesaw)
+
+    def __hash__(self):
+        # this is here so keys can be put in a set used as a dict key
+        return hash((self._key_num, self._seesaw))
+
+    @property
+    def key_num(self):
+        """Key number assigned by NeoKey1x4. Read-only."""
+        return self._key_num
 
     @property
     def pressed(self):
@@ -117,7 +136,7 @@ class NeoKey_Key:
 
     @property
     def color(self):
-        """Read-write property representing the Key's pixel color.
+        """Read-write property representing the key's pixel color.
         Reads and writes are done over the I2C bus."""
         return self._pixel[self._key_num]
 
@@ -127,7 +146,7 @@ class NeoKey_Key:
 
     @property
     def blink(self):
-        """Read-write property, True when Key is blinking."""
+        """Read-write property, True when key is blinking."""
         return self._blink
 
     @blink.setter
@@ -266,7 +285,7 @@ class NeoKey1x4:
         self._seesaws = tuple(seesaws)
         self._pixels = tuple(pixels)
         self._keys = tuple(keys)
-        self._brightness = brightness
+        self._brightness = float(brightness)
         self._key_bits = [0x0] * len(seesaws)
         self.set_auto_colors(auto_colors)
         self.set_auto_action(auto_action)
