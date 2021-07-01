@@ -96,7 +96,7 @@ class NeoKey_Key:
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
         Returns True if the key is being pressed.
-        Has no effect on auto_color or auto_action status."""
+        Has no effect on auto_colors or auto_action status."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
@@ -166,7 +166,7 @@ class NeoKey1x4:
 
     Similarly, to have read_keys run arbitrary code whenever a key is pressed,
     use the NeoKey1x4 constructor's auto_action parameter. Any return value
-    from the function will be ignored. As with auto_color, it will be passed
+    from the function will be ignored. As with auto_colors, it will be passed
     a single NeoKeyEvent argument.
 
     The blink parameter is provided to initially enable all keys to blink
@@ -301,7 +301,7 @@ class NeoKey1x4:
 
     def read_keys(self):
         """Check activity of all keys on all NeoKey1x4 modules.
-        Invokes optional auto_color and auto_action functions.
+        Invokes optional auto_colors and auto_action functions.
         Returns a list of NeoKeyEvent object corresponding keys pressed
         or released since the previous check."""
         events = []
