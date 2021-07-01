@@ -68,21 +68,21 @@ _NEOKEY1X4_COUNT = const(4)
 NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
 """Event list element.
 
-    :param int key_num: key number. 0-3 on first NeoKey1x4, 4-7 on second, etc.
+    :param int key_num: key number. 0-3 on first NeoKey, 4-7 on second, etc.
     :param bool pressed: True for key press event; False for key release event."""
 
 # pylint: disable=missing-docstring
 
 
-class NeoKey_Key:
+class NeoKeyKey:
     """A single key+pixel pairing.
 
-    :param ~Seesaw.seesaw seesaw: NeoKey1x4 Seesaw
-    :param ~Seesaw.neopixel pixel: NeoKey1x4 NeoPixel
+    :param ~Seesaw.seesaw seesaw: NeoKey Seesaw
+    :param ~Seesaw.neopixel pixel: NeoKey NeoPixel
     :param int key_num: key number assigned by NeoKey1x4
 
-    One NeoKey_Key instance is created by NeoKey1x4 for each key.
-    Keys are numbered 0-3 on the first NeoKey1x4. 4-7 on the second, etc.
+    One NeoKeyKey instance is created by NeoKey1x4 for each key.
+    Keys are numbered 0-3 on the first NeoKey. 4-7 on the second, etc.
 
     These instances can be referenced by indexing the NeoKey1x4
     object, as shown here.
@@ -92,7 +92,7 @@ class NeoKey_Key:
         neokey = NeoKey1x4(i2c)
         neokey[0].color = 0xFF0000 # set color
         neokey[1].blink = True # turn on blinking
-        key = neokey[2] # reference a NeoKey_Key instance
+        key = neokey[2] # reference a NeoKeyKey instance
         print(key.pressed) # True while the key is pressed
     """
 
@@ -107,7 +107,7 @@ class NeoKey_Key:
         self._blink = bool(blink)
 
     def __lt__(self, other):
-        # this is here for sorting of NeoKey_Keys (hmmm...)
+        # this is here for sorting of NeoKeyKeys (hmmm...)
         # Key nums are unique for a single NeoKey1x4 instance,
         # but could somebody have two? That's why _seesaw is here.
         return (self._key_num, self._seesaw) < (other._key_num, other._seesaw)
@@ -170,8 +170,8 @@ def _blink_now():
 class NeoKey1x4:
     """Alternative API for Adafruit's I2C keyboard with NeoPixel lights.
 
-    :param ~busio.I2C i2c_bus: Bus the NeoKey1x4 is connected to
-    :param int addr: I2C address (or list of addresses) of NeoKey1x4 module(s)
+    :param ~busio.I2C i2c_bus: Bus the NeoKey is connected to
+    :param int addr: I2C address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: NeoPixel intensity
     :param function auto_colors: set colors when keys pressed/released
     :param function auto_action: run when keys pressed/released
@@ -182,7 +182,7 @@ class NeoKey1x4:
     use, though at the cost of memory. For newer CircuitPython hardware,
     memory is more plentiful, so increased memory use may not be a concern.
 
-    Basic usage is one NeoKey1x4 module. In that case, supply its I2C address
+    Basic usage is one NeoKey module. In that case, supply its I2C address
     as the addr argument.
 
     To use more than one module at once, instead supply a list (or tuple) of
@@ -190,6 +190,10 @@ class NeoKey1x4:
     by solder-bridging the address selectors to give each board a unique
     address. Key numbers will be assigned to the keys in the order of board
     addresses in the list, first 0-3, second 4-7, ..., eighth 28-31.
+
+    Keys may be referenced by indexing the NeoKey1x4 instance. Each key is
+    represented by a NeoKeyKey instance. See that section for the attributes
+    of those objects.
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
@@ -281,7 +285,7 @@ class NeoKey1x4:
             pixels.append(np_mod)
             np_mod.fill(0)
             for key_num, _ in enumerate(_NEOKEY1X4_KEYS):
-                keys.append(NeoKey_Key(ss_mod, np_mod, key_num, blink=blink))
+                keys.append(NeoKeyKey(ss_mod, np_mod, key_num, blink=blink))
         self._seesaws = tuple(seesaws)
         self._pixels = tuple(pixels)
         self._keys = tuple(keys)
@@ -300,7 +304,8 @@ class NeoKey1x4:
         return len(self._keys)
 
     def fill(self, color):
-        """Set all keys' NeoPixels to the specified color.
+        """Set all keys to the specified color.
+        Useful when setting key colors other than with auto_colors.
 
         :param int color: 24-bit color integer"""
         for pixel in self._pixels:
@@ -308,7 +313,7 @@ class NeoKey1x4:
 
     @property
     def brightness(self):
-        """Brightness value shared by all NeoKey1x4 NeoPixels."""
+        """Brightness value shared by all NeoKey NeoPixels."""
         return self._brightness
 
     @brightness.setter
@@ -320,6 +325,7 @@ class NeoKey1x4:
     def set_auto_colors(self, auto_colors):
         """Set automatic color management function. When defined, is invoked on
         key press or release and is passed a single NeoKeyEvent as argument.
+        Use None to remove a previously set function.
 
         :param function auto_colors: function expecting event, returns color"""
         if auto_colors is not None:
@@ -333,6 +339,7 @@ class NeoKey1x4:
     def set_auto_action(self, auto_action):
         """Set automatic action function. When defined, is invoked on key press
         or release and is passed a single NeoKeyEvent as argument.
+        Use None to remove a previously set function.
 
         :param function auto_action: function expecting event as argument"""
         if auto_action is not None:
@@ -341,7 +348,7 @@ class NeoKey1x4:
         self._auto_action = auto_action
 
     def read_keys(self):
-        """Check activity of all keys on all NeoKey1x4 modules.
+        """Check activity of all keys on all NeoKey modules.
         Invokes optional auto_colors and auto_action functions.
         Returns a list of NeoKeyEvent object corresponding keys pressed
         or released since the previous check."""
