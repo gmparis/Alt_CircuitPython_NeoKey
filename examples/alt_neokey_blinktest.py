@@ -5,7 +5,7 @@
 from random import randrange
 from collections import namedtuple
 import board
-from alt_neokey.neokey1x4 import NeoKey1x4
+from alt_neokey.alt_neokey1x4 import NeoKey1x4
 
 # If you have one module, swap which line is commented.
 # MODULES = 0x30

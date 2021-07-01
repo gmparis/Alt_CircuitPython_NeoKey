@@ -4,7 +4,7 @@
 
 from time import sleep
 import board
-from alt_neokey.neokey1x4 import NeoKey1x4
+from alt_neokey.alt_neokey1x4 import NeoKey1x4
 
 print("Alternative API NeoKey action test")
 

@@ -66,7 +66,7 @@ Usage Example
 .. code-block:: py
 
    import board
-   from alt_neokey.neokey1x4 import NeoKey1x4
+   from alt_neokey.alt_neokey1x4 import NeoKey1x4
 
    i2c = board.I2C()
    neokey = NeoKey(i2c)

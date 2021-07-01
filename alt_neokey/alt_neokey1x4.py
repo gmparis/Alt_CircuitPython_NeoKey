@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MIT
 """
-`alt_neokey.neokey1x4`
+`alt_neokey.alt_neokey1x4`
 ================================================================================
 
 Alternative CircuitPython API for NeoKey I2C Keypad
@@ -232,7 +232,7 @@ class NeoKey1x4:
     .. sourcecode:: python
 
         import board
-        from alt_neokey.neokey1x4 import NeoKey1x4
+        from alt_neokey.alt_neokey1x4 import NeoKey1x4
         i2c = board.I2C()
         neokey = NeoKey1x4(
             i2c,
