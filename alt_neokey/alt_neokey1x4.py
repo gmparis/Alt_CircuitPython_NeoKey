@@ -181,6 +181,9 @@ class NeoKey1x4:
     would have to code into their main loops into this library, simplifying
     use, though at the cost of memory. For newer CircuitPython hardware,
     memory is more plentiful, so increased memory use may not be a concern.
+    Comparing simpletest examples from the two libraries, this alternative
+    uses about 8 KB more memory. The all-bells-and-whistles blinktest
+    example uses another 3 KB.
 
     Basic usage is one NeoKey module. In that case, supply its I2C address
     as the addr argument.
