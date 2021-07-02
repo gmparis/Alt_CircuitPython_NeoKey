@@ -328,7 +328,7 @@ class NeoKey1x4:
 
     @property
     def auto_colors(self):
-        """Automatic color management function. When defined, is invoked on
+        """Automatic color management function. Function is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
         The function must return a 24-bit RGB color integer.
         Use ``None`` to remove a previously set **auto_color** function.
@@ -348,7 +348,7 @@ class NeoKey1x4:
 
     @property
     def auto_action(self):
-        """Set automatic action function. When defined, is invoked on key press
+        """Automatic action function. Function is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
         The return value of this function is ignored.
         Use ``None`` to remove a previously set function."""
