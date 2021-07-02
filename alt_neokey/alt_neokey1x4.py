@@ -75,25 +75,33 @@ NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
 
 
 class NeoKeyKey:
-    """A single key+pixel pairing.
+    """A single key and pixel pairing.
 
     :param ~Seesaw.seesaw seesaw: NeoKey Seesaw
     :param ~Seesaw.neopixel pixel: NeoKey NeoPixel
     :param int key_num: key number assigned by *NeoKey1x4*
 
-    One *NeoKeyKey* instance is created by *NeoKey1x4* for each key.
-    Keys are numbered 0-3 on the first NeoKey. 4-7 on the second, etc.
+    The constructor for this class is not intended to be invoked
+    by anything other than *NeoKey1x4*. One *NeoKeyKey* instance
+    is created by *NeoKey1x4* for each key. Keys are numbered 0-3
+    on the first NeoKey module. 4-7 on the second, etc.
 
-    These instances can be referenced by indexing the *NeoKey1x4*
-    object, as shown here.
+    These instances can be referenced by indexing a *NeoKey1x4*
+    object, as shown in the examples below.
 
     .. sourcecode:: python
 
-        neokey = NeoKey1x4(i2c)
-        neokey[0].color = 0xFF0000 # set color
-        neokey[1].blink = True # turn on blinking
-        key = neokey[2] # reference a NeoKeyKey instance
-        print(key.pressed) # True while the key is pressed
+        keys = NeoKey1x4(i2c) # used below
+
+        keys[0].color = 0xFF0000 # make red
+        keys[3].blink = True # start blinking
+
+        key = keys[0] # reference a NeoKeyKey instance
+        key.color = 0xFF0000 # same as above example
+
+        # key numbers of keys pressed now
+        pressed = [k for k in keys if keys[k].pressed]
+
     """
 
     __slots__ = ("_seesaw", "_pixel", "_key_num", "_blink")
@@ -129,7 +137,17 @@ class NeoKeyKey:
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
         Read-only property is ``True`` if the key is being pressed.
-        Does not invoke or otherwise affect **auto_colors** or **auto_action**."""
+        Does not invoke or otherwise affect **auto_colors** or **auto_action**.
+
+        .. note:: The user is encouraged to use one or both of the **auto_**
+            functions of *NeoKey1x4*, or process the list of events returned
+            by *NeoKey1x4*'s ``read_keys()`` method, rather than using
+            ``pressed`` to regularly check key state. Those approaches are
+            more efficient users of the I2C bus than is ``pressed``. However,
+            if ``pressed`` is suitable to your needs, you should consider
+            using the standard NeoKey module instead of this alternative.
+
+        """
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
@@ -178,7 +196,7 @@ class NeoKey1x4:
     :param bool blink: blink all keys when they are not pressed
 
     The intent of this alternative API is to put functionality that users
-    would have to code into their main loops into this library, simplifying
+    might code into their main loops into this library instead, simplifying
     use, though at the cost of memory. For newer CircuitPython hardware,
     memory is more plentiful, so increased memory use may not be a concern.
     Comparing simpletest examples from the two libraries, this alternative
@@ -188,15 +206,15 @@ class NeoKey1x4:
     Basic usage is one NeoKey module. In that case, supply its I2C address
     as the **addr** argument.
 
-    To use more than one module at once, instead supply a list or tuple of
+    To use multiple modules together, instead supply a list or tuple of
     I2C addresses as the **addr** argument. Up to eight modules can be supported
     by solder-bridging the address selectors to give each board a unique
     address. Key numbers will be assigned to the keys in the order of board
     addresses in the list, first 0-3, second 4-7, ..., eighth 28-31.
 
     Keys may be referenced by indexing the *NeoKey1x4* instance. Each key is
-    represented by a *NeoKeyKey* instance. See that section for the attributes
-    of those objects.
+    represented by a *NeoKeyKey* instance. See the section about that class
+    for its attributes.
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
@@ -208,13 +226,13 @@ class NeoKey1x4:
     Similarly, to have ``read_keys()`` run arbitrary code whenever a key is pressed,
     use the *NeoKey1x4* constructor's **auto_action** parameter. Any return value
     from the function will be ignored. As with **auto_colors**, it will be passed
-    a single *NeoKeyEvent* argument.
+    a single *NeoKeyEvent* argument when invoked.
 
     The **blink** parameter is provided to initially enable all keys to blink
     while not being pressed, as sensed by ``read_keys()``. Keys may be set
     individually to blink or not blink using their **blink** property,
     regardless of the **blink** value passed to the *NeoKey1x4* constructor.
-    The blink feature requires ``time.monotonic_ns``, which is not available
+    The blink feature requires ``time.monotonic_ns()``, which is not available
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a *RuntimeError* exception.
 
