@@ -1,21 +1,24 @@
 # SPDX-FileCopyrightText: Copyright (c) 2021 Greg Paris
 #
-# SPDX-License-Identifier: Unlicense
+# SPDX-License-Identifier: MIT
 
-from random import randrange
 from collections import namedtuple
+from random import randrange
+import gc
 import board
-from alt_neokey.alt_neokey1x4 import NeoKey1x4
-
-# If you have one module, swap which line is commented.
-# MODULES = 0x30
-MODULES = (0x30, 0x31)
 
 # This example is more fun than the rest!
 print("Alternative API NeoKey blink test")
 
-# use default I2C bus
-i2c_bus = board.I2C()
+# report memory before instantiating NeoKey1x4
+used1, free1 = gc.mem_alloc(), gc.mem_free()  # pylint: disable=no-member
+print(f"Memory: Start: alloc={used1} free={free1}")
+
+from alt_neokey.alt_neokey1x4 import NeoKey1x4  # pylint: disable=wrong-import-position
+
+# If you have one module, swap which line is commented.
+# MODULES = 0x30
+MODULES = (0x30, 0x31)
 
 System = namedtuple("System", "name color")
 SYSTEMS = (
@@ -36,6 +39,8 @@ def my_colors(event):
     # Other than the weird colors for this demo, this looks great!
     return 0 if event.pressed else SYSTEMS[event.key_num].color
 
+
+i2c_bus = board.I2C()
 
 # Create a NeoKey object for two NeoKey1x4 modules
 neokey = NeoKey1x4(
@@ -66,6 +71,11 @@ neokey.set_auto_action(my_action)
 for _ in range(3):
     key_num = randrange(len(neokey))
     neokey[key_num].blink = True
+
+# report memory again
+used2, free2 = gc.mem_alloc(), gc.mem_free()  # pylint: disable=no-member
+delta = used2 - used1
+print(f"Memory: After: alloc={used2} free={free2} delta={delta}")
 
 # Read keys, process any events. Manage colors and blinking.
 # If you want responsive keys, you can't spend much time doing work!
