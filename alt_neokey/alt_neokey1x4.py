@@ -351,10 +351,13 @@ class NeoKey1x4:
         self._auto_action = auto_action
 
     def read_keys(self):
-        """Check activity of all keys on all NeoKey modules.
-        Invokes optional auto_colors and auto_action functions.
-        Returns a list of NeoKeyEvent object corresponding keys pressed
-        or released since the previous check."""
+        """Query the status of all keys on all NeoKey modules
+        via the I2C bus. Compare results with the last time
+        this method was invoked in order to determine key events
+        (presses and releases). For each event, read_keys invokes
+        the optional auto_colors and auto_action functions with
+        the describing NeoKeyEvent as sole argument. Returns a list
+        of all NeoKeyEvents."""
         events = []
         do_blink = False
         if _blink_check(False):  # non-fatal check
