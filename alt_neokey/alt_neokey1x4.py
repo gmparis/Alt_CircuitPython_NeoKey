@@ -218,12 +218,11 @@ class NeoKey1x4:
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a *RuntimeError* exception.
 
-    .. note:: The **auto_colors** function, if defined, is used by the
-        constructor to initialize key colors. It is also used with blink mode to
-        establish the 'on' color in the on/off cycle. For predictable results,
-        the **auto_colors** function should be re-entrant and without side effects.
-        In contrast, the **auto_action** function can be relied upon to be called
-        only on key press and key release events.
+    .. note:: The **auto_colors** function is used to initialize key colors
+        whenever it is set or changed (except when set to ``None``).
+        It is used with blink mode to establish the 'on' color in the on/off
+        cycle. In contrast, the **auto_action** function can be relied upon
+        to be called only on key press and key release events.
 
     Any time spent doing anything other than reading keys can detract from
     the responsiveness of the keys. It's probably a good idea to have keys
@@ -296,8 +295,8 @@ class NeoKey1x4:
         self._keys = tuple(keys)
         self._brightness = float(brightness)
         self._key_bits = [0x0] * len(seesaws)
-        self.set_auto_colors(auto_colors)
-        self.set_auto_action(auto_action)
+        self.auto_colors = auto_colors
+        self.auto_action = auto_action
 
     def __getitem__(self, key_num):
         return self._keys[key_num]
@@ -327,30 +326,40 @@ class NeoKey1x4:
         for pixel in self._pixels:
             pixel.brightness = brightness
 
-    def set_auto_colors(self, auto_colors):
-        """Set automatic color management function. When defined, is invoked on
+    @property
+    def auto_colors(self):
+        """Automatic color management function. When defined, is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
-        Use ``None`` to remove a previously set function.
+        The function must return a 24-bit RGB color integer.
+        Use ``None`` to remove a previously set **auto_color** function.
+        All keys are immediately set to their 'released' color whenever
+        this parameter is set to a value other than ``None``."""
+        return self._auto_colors
 
-        :param function auto_colors: function expecting event, returns color"""
-        if auto_colors is not None:
-            if not callable(auto_colors):
-                raise TypeError("auto_colors must be a function")
+    @auto_colors.setter
+    def auto_colors(self, function):
+        if function is not None:
+            if not callable(function):
+                raise TypeError("auto_colors value must be a function")
             for key_num in self:
                 # initialize to the released color
-                self._keys[key_num].color = auto_colors(NeoKeyEvent(key_num, False))
-        self._auto_colors = auto_colors
+                self._keys[key_num].color = function(NeoKeyEvent(key_num, False))
+        self._auto_colors = function
 
-    def set_auto_action(self, auto_action):
+    @property
+    def auto_action(self):
         """Set automatic action function. When defined, is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
-        Use ``None`` to remove a previously set function.
+        The return value of this function is ignored.
+        Use ``None`` to remove a previously set function."""
+        return self._auto_action
 
-        :param function auto_action: function expecting event as argument"""
-        if auto_action is not None:
-            if not callable(auto_action):
-                raise TypeError("auto_action must be a function")
-        self._auto_action = auto_action
+    @auto_action.setter
+    def auto_action(self, function):
+        if function is not None:
+            if not callable(function):
+                raise TypeError("auto_action value must be a function")
+        self._auto_action = function
 
     def read_keys(self):
         """Query the status of all keys on all NeoKey modules

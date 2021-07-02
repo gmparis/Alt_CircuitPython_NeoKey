@@ -65,7 +65,7 @@ def my_action(event):
             print(f"{SYSTEMS[event.key_num].name} alert cleared.")
 
 
-neokey.set_auto_action(my_action)
+neokey.auto_action = my_action
 
 # We have some warnings!
 for _ in range(3):
