@@ -359,7 +359,7 @@ class NeoKey1x4:
         (presses and releases). For each event, ``read_keys()`` invokes
         the optional **auto_colors** and **auto_action** functions with
         the describing *NeoKeyEvent* as sole argument. Returns a list
-        of all *NeoKeyEvent*s."""
+        of all the key events that occurred (type *NeoKeyEvent*)."""
         events = []
         do_blink = False
         if _blink_check(False):  # non-fatal check
