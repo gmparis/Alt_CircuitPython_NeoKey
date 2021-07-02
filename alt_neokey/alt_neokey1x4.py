@@ -242,7 +242,9 @@ class NeoKey1x4:
             auto_colors=lambda e: 0xFFFFFF if e.pressed else 0
         )
         while True:
-            neokey.read_keys()"""
+            neokey.read_keys()
+
+    """
 
     def __init__(
         self,
