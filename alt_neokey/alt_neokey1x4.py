@@ -142,9 +142,9 @@ class NeoKeyKey:
         .. note:: The user is encouraged to use one or both of the **auto_**
             functions of *NeoKey1x4*, or process the list of events returned
             by *NeoKey1x4*'s ``read_keys()`` method, rather than using
-            ``pressed`` to regularly check key state. Those approaches are
-            more efficient users of the I2C bus than is ``pressed``. However,
-            if ``pressed`` is suitable to your needs, you should consider
+            **pressed** to regularly check key state. Those approaches are
+            more efficient users of the I2C bus than is **pressed**. However,
+            if **pressed** is suitable to your needs, you should consider
             using the standard NeoKey module instead of this alternative.
 
         """
