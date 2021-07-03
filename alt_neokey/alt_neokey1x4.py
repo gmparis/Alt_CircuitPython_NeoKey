@@ -91,16 +91,16 @@ class NeoKeyKey:
 
     .. sourcecode:: python
 
-        keys = NeoKey1x4(i2c, addr=[0x30, 0x31, 0x32])
+        neokey = NeoKey1x4(i2c, addr=[0x30, 0x31, 0x32])
 
-        keys[0].color = 0xFF0000 # make red
-        keys[11].blink = True # start blinking
+        neokey[0].color = 0xFF0000 # make red
+        neokey[11].blink = True # start blinking
 
-        key = keys[0] # reference a NeoKeyKey instance
+        key = neokey[0] # reference a NeoKeyKey instance
         key.color = 0xFF0000 # same as above example
 
         # key numbers of keys pressed now
-        pressed = [k for k in keys if keys[k].pressed]
+        pressed = [k for k in neokey if neokey[k].pressed]
 
     """
 
