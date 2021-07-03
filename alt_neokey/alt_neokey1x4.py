@@ -130,12 +130,14 @@ class NeoKeyKey:
 
     @property
     def key_num(self):
-        """Key number assigned by *NeoKey1x4*. Read-only."""
+        """:type: int
+        Key number assigned by *NeoKey1x4*. Read-only."""
         return self._key_num
 
     @property
     def pressed(self):
-        """Immediate read of this key's state via the I2C bus.
+        """:type: bool
+        Immediate read of this key's state via the I2C bus.
         Read-only property is *True* if the key is being pressed.
         Does not invoke or otherwise affect **auto_color** or **auto_action**.
 
@@ -154,7 +156,8 @@ class NeoKeyKey:
 
     @property
     def color(self):
-        """Read-write property representing the key's pixel color.
+        """:type: int
+        Read-write property representing the key's pixel color.
         Reads and writes are done over the I2C bus."""
         return self._pixel[self._key_num]
 
@@ -164,7 +167,8 @@ class NeoKeyKey:
 
     @property
     def blink(self):
-        """Read-write property, *True* when key is blinking."""
+        """:type: bool
+        Read-write property, *True* when key is blinking."""
         return self._blink
 
     @blink.setter
@@ -342,8 +346,8 @@ class NeoKey1x4:
 
     @property
     def brightness(self):
-        """Brightness value shared by all NeoKey LEDs.
-        :type: float"""
+        """:type: float
+        Brightness value shared by all NeoKey LEDs."""
         return self._brightness
 
     @brightness.setter
@@ -354,7 +358,8 @@ class NeoKey1x4:
 
     @property
     def auto_color(self):
-        """Automatic color management function. Function is invoked on
+        """:type: function
+        Automatic color management function. Function is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
         The function must return a 24-bit RGB color integer.
         Use *None* to remove a previously set **auto_color** function.
@@ -374,7 +379,6 @@ class NeoKey1x4:
                         else:
                             neokey.auto_color = normal_mode
 
-        :type: function
         """
         return self._auto_color
 
@@ -390,13 +394,11 @@ class NeoKey1x4:
 
     @property
     def auto_action(self):
-        """Automatic action function. Function is invoked on key press
+        """:type: function
+        Automatic action function. Function is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
         The return value of this function is ignored.
-        Use *None* to remove a previously set function.
-
-        :type: function
-        """
+        Use *None* to remove a previously set function."""
         return self._auto_action
 
     @auto_action.setter
