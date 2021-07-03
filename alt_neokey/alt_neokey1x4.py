@@ -130,13 +130,15 @@ class NeoKeyKey:
 
     @property
     def key_num(self):
-        """:type: int
+        """
+        :type: int
         Key number assigned by *NeoKey1x4*. Read-only."""
         return self._key_num
 
     @property
     def pressed(self):
-        """:type: bool
+        """
+        :type: bool
         Immediate read of this key's state via the I2C bus.
         Read-only property is *True* if the key is being pressed.
         Does not invoke or otherwise affect **auto_color** or **auto_action**.
@@ -156,7 +158,8 @@ class NeoKeyKey:
 
     @property
     def color(self):
-        """:type: int
+        """
+        :type: int
         Read-write property representing the key's pixel color.
         Reads and writes are done over the I2C bus."""
         return self._pixel[self._key_num]
@@ -167,7 +170,8 @@ class NeoKeyKey:
 
     @property
     def blink(self):
-        """:type: bool
+        """
+        :type: bool
         Read-write property, *True* when key is blinking."""
         return self._blink
 
@@ -346,7 +350,8 @@ class NeoKey1x4:
 
     @property
     def brightness(self):
-        """:type: float
+        """
+        :type: float
         Brightness value shared by all NeoKey LEDs."""
         return self._brightness
 
@@ -358,7 +363,8 @@ class NeoKey1x4:
 
     @property
     def auto_color(self):
-        """:type: function
+        """
+        :type: function
         Automatic color management function. Function is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
         The function must return a 24-bit RGB color integer.
@@ -394,7 +400,8 @@ class NeoKey1x4:
 
     @property
     def auto_action(self):
-        """:type: function
+        """
+        :type: function
         Automatic action function. Function is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
         The return value of this function is ignored.
