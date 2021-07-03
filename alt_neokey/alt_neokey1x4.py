@@ -180,11 +180,6 @@ def _bits_to_keys(seesaw_num, bits):
     return [(k + offset) for k in range(_NEOKEY1X4_COUNT) if _NEOKEY1X4_KEYS[k] & bits]
 
 
-def _blink_now():
-    """Odd seconds on, even seconds off"""
-    return bool((monotonic_ns() // 1_000_000_000) % 2)
-
-
 class NeoKey1x4:
     """Alternative API for Adafruit's I2C keypad with RGB LEDs.
 
@@ -264,6 +259,17 @@ class NeoKey1x4:
             neokey.read_keys()
 
     """
+
+    # blink rate could be problematic depending on work load,
+    # processor power, and number of NeoKey modules, so the
+    # parameters are set in the class in case the user wishes
+    # to override them in their instance
+    blink_period = 20  #: blink period in tenths of a second
+    blink_on = 14  #: lit time per period in second tenths
+
+    def _blink_now(self):
+        """True when blink is in 'on' state."""
+        return (monotonic_ns() // 100_000_000) % self.blink_period < self.blink_on
 
     def __init__(
         self,
@@ -407,7 +413,7 @@ class NeoKey1x4:
         events = []
         do_blink = False
         if _blink_check(False):  # non-fatal check
-            blink_wanted = _blink_now()
+            blink_wanted = self._blink_now()
             if blink_wanted != self._blink_state:
                 do_blink = True
                 self._blink_state = blink_wanted
