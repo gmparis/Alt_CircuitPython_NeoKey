@@ -38,16 +38,16 @@ key_colors = (
 )
 
 
-def my_colors(event):
-    return key_colors[event.key_num] if event.pressed else 0
+def my_colors(kev):
+    return key_colors[kev.key_num] if kev.pressed else 0
 
 
 # this time, instead of reading the event list, we'll perform an automatic action
-def my_action(event):
-    if event.pressed:
-        print(f"key {event.key_num} pressed")
+def my_action(kev):
+    if kev.pressed:
+        print(f"key {kev.key_num} pressed")
     else:
-        print(f"key {event.key_num} released")
+        print(f"key {kev.key_num} released")
     sleep(0.1)  # pretend to do stuff
 
 

@@ -39,11 +39,11 @@ SYSTEMS = (
 )
 
 
-def my_colors(event):
+def my_colors(kev):
     # blink will default to white if the released color is 0
     # so, this time, we'll choose to go dark when pressed.
     # Other than the weird colors for this demo, this looks great!
-    return 0 if event.pressed else SYSTEMS[event.key_num].color
+    return 0 if kev.pressed else SYSTEMS[kev.key_num].color
 
 
 i2c_bus = board.I2C()
@@ -61,14 +61,14 @@ neokey = NeoKey1x4(
 # but not both, since that would negate itself. Also, we
 # must define this function *after* we have neokey, since
 # we need a reference to it.
-def my_action(event):
-    if event.pressed:
-        key = neokey[event.key_num]  # this is a NeoKey_Key object
+def my_action(kev):
+    if kev.pressed:
+        key = neokey[kev.key_num]  # this is a NeoKey_Key object
         key.blink = not key.blink
         if key.blink:
-            print(f"ALERT on {SYSTEMS[event.key_num].name}!")
+            print(f"ALERT on {SYSTEMS[kev.key_num].name}!")
         else:
-            print(f"{SYSTEMS[event.key_num].name} alert cleared.")
+            print(f"{SYSTEMS[kev.key_num].name} alert cleared.")
 
 
 neokey.auto_action = my_action

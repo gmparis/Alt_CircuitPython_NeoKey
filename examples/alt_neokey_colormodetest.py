@@ -13,12 +13,12 @@ from alt_neokey.alt_neokey1x4 import NeoKey1x4
 print("Alt API NeoKey color modes test")
 
 
-def normal_mode(event):
-    return 0xFF0000 if event.pressed else 0x777777
+def normal_mode(kev):
+    return 0xFF0000 if kev.pressed else 0x777777
 
 
-def special_mode(event):
-    return 0xFF7700 if event.pressed else 0x007700
+def special_mode(kev):
+    return 0xFF7700 if kev.pressed else 0x007700
 
 
 i2c = board.I2C()
