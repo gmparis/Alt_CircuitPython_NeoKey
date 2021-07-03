@@ -195,22 +195,24 @@ class NeoKey1x4:
     :param function auto_action: run when keys pressed/released
     :param bool blink: blink all keys when they are not pressed
 
-    The intent of this alternative API is to put functionality that users
-    might code into their main loops into this library instead, simplifying
-    use, though at the cost of memory. For newer CircuitPython hardware,
-    memory is more plentiful, so increased memory use may not be a concern.
-    Comparing simpletest examples from the two libraries, this alternative
-    uses about 8 KB more memory. The all-bells-and-whistles blinktest
-    example uses another 3 KB.
+    The intent of this alternative API is to reduce the amount of user
+    code necessary to manage key colors and respond to key-press events.
+    The cost is that this library uses more memory than the standard
+    does. Comparing *simpletest* examples from the two libraries, this
+    alternative uses about 8 KB more memory. The all-bells-and-whistles
+    *blinktest* example uses another 3 KB.
 
     Basic usage is one NeoKey module. In that case, supply its I2C address
     as the **addr** argument.
 
-    To use multiple modules together, instead supply a list or tuple of
-    I2C addresses as the **addr** argument. Up to eight modules can be supported
+    To use multiple modules together, supply a list or tuple of I2C addresses
+    as the **addr** argument. Up to eight modules can be supported
     by solder-bridging the address selectors to give each board a unique
     address. Key numbers will be assigned to the keys in the order of board
     addresses in the list, first 0-3, second 4-7, ..., eighth 28-31.
+    (If you accidentally assemble your project with the modules not in
+    ascending address order, no worries! Just order them the same way
+    in the **addr** list and the keys will be numbered the way you want.)
 
     Keys may be referenced by indexing the *NeoKey1x4* instance. Each key is
     represented by a *NeoKeyKey* instance. See the section about that class
