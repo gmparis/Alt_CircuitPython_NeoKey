@@ -192,9 +192,10 @@ class NeoKey1x4:
 
     The intent of this alternative API is to reduce the amount of user
     code necessary to manage key colors and respond to key-press events.
-    The cost is that this library uses more memory than the standard
-    does. Comparing *simpletest* examples from the two libraries, this
-    alternative uses about 8 KB more memory. The all-bells-and-whistles
+    It also simplifies the task of managing more than one NeoKey module
+    simultaneously. The cost is that this library uses more memory than
+    the standard does. Comparing *simpletest* examples from the two libraries,
+    this alternative uses about 8 KB more memory. The all-bells-and-whistles
     *blinktest* example uses another 3 KB.
 
     Basic usage is one NeoKey module. In that case, supply its I2C address
