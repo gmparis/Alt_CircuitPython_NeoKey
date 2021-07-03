@@ -69,15 +69,16 @@ Usage Example
    from alt_neokey.alt_neokey1x4 import NeoKey1x4
 
    i2c = board.I2C()
-   neokey = NeoKey(i2c)
+   neokey = NeoKey1x4(i2c)
+
+   # set colors in main loop by processing event list
    while True:
-      events = neokey.read_keys()
-      for event in events:
+      for event in neokey.read_keys():
          if event.pressed:
-            neokey[event.key].color = 0x0000FF
+            neokey[event.key_num].color = 0x0000FF
          else:
-            neokey[event.key].color = 0
-         print(event.key, event.pressed)
+            neokey[event.key_num].color = 0
+         print(event.key_num, event.pressed)
 
 Contributing
 ============
