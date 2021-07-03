@@ -69,7 +69,7 @@ NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
 """Event list element.
 
     :param int key_num: key number. 0-3 on first NeoKey, 4-7 on second, etc.
-    :param bool pressed: ``True`` for key press event; ``False`` for key release event."""
+    :param bool pressed: *True* for key press event; *False* for key release event."""
 
 # pylint: disable=missing-docstring
 
@@ -136,12 +136,12 @@ class NeoKeyKey:
     @property
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
-        Read-only property is ``True`` if the key is being pressed.
+        Read-only property is *True* if the key is being pressed.
         Does not invoke or otherwise affect **auto_colors** or **auto_action**.
 
         .. note:: The user is encouraged to use one or both of the **auto_**
             functions of *NeoKey1x4*, or process the list of events returned
-            by *NeoKey1x4*'s ``read_keys()`` method, rather than using
+            by *NeoKey1x4*'s **read_keys()** method, rather than using
             **pressed** to regularly check key state. Those approaches are
             more efficient users of the I2C bus than is **pressed**. However,
             if **pressed** is suitable to your needs, you should consider
@@ -164,7 +164,7 @@ class NeoKeyKey:
 
     @property
     def blink(self):
-        """Read-write property, ``True`` when key is blinking."""
+        """Read-write property, *True* when key is blinking."""
         return self._blink
 
     @blink.setter
@@ -220,24 +220,24 @@ class NeoKey1x4:
     loop, create a function that returns a color (24-bit RGB) and pass it
     to the *NeoKey1x4* constructor using the **auto_colors** parameter. The function
     will be called for each key press and key release event, as detected by
-    the ``read_keys()`` method. That method will call the function with a single
+    the **read_keys()** method. That method will call the function with a single
     argument, a *NeoKeyEvent*.
 
-    Similarly, to have ``read_keys()`` run arbitrary code whenever a key is pressed,
+    Similarly, to have **read_keys()** run arbitrary code whenever a key is pressed,
     use the *NeoKey1x4* constructor's **auto_action** parameter. Any return value
     from the function will be ignored. As with **auto_colors**, it will be passed
     a single *NeoKeyEvent* argument when invoked.
 
     The **blink** parameter is provided to initially enable all keys to blink
-    while not being pressed, as sensed by ``read_keys()``. Keys may be set
+    while not being pressed, as sensed by **read_keys()**. Keys may be set
     individually to blink or not blink using their **blink** property,
     regardless of the **blink** value passed to the *NeoKey1x4* constructor.
-    The blink feature requires ``time.monotonic_ns()``, which is not available
+    The blink feature requires **time.monotonic_ns()**, which is not available
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a *RuntimeError* exception.
 
     .. note:: The **auto_colors** function is used to initialize key colors
-        whenever it is set or changed (except when set to ``None``).
+        whenever it is set or changed (except when set to *None*).
         It is used with blink mode to establish the 'on' color in the on/off
         cycle. In contrast, the **auto_action** function can be relied upon
         to be called only on key press and key release events.
@@ -349,9 +349,9 @@ class NeoKey1x4:
         """Automatic color management function. Function is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
         The function must return a 24-bit RGB color integer.
-        Use ``None`` to remove a previously set **auto_color** function.
+        Use *None* to remove a previously set **auto_color** function.
         All keys are immediately set to their 'released' color whenever
-        this parameter is set to a value other than ``None``."""
+        this parameter is set to a value other than *None*."""
         return self._auto_colors
 
     @auto_colors.setter
@@ -369,7 +369,7 @@ class NeoKey1x4:
         """Automatic action function. Function is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
         The return value of this function is ignored.
-        Use ``None`` to remove a previously set function."""
+        Use *None* to remove a previously set function."""
         return self._auto_action
 
     @auto_action.setter
@@ -383,7 +383,7 @@ class NeoKey1x4:
         """Query the status of all keys on all NeoKey modules
         via the I2C bus. Compare results with the last time
         this method was invoked in order to determine key events
-        (presses and releases). For each event, ``read_keys()`` invokes
+        (presses and releases). For each event, **read_keys()** invokes
         the optional **auto_colors** and **auto_action** functions with
         the describing *NeoKeyEvent* as sole argument. Returns a list
         of all the key events that occurred (type *NeoKeyEvent*)."""
@@ -420,7 +420,7 @@ class NeoKey1x4:
         return events
 
     def _blink_key(self, key_num, state):
-        """If state ``True``, turn on color using **auto_colors** or white; otherwise dark"""
+        """If state *True*, turn on color using **auto_colors** or white; otherwise dark"""
         if not state:
             color = 0
         elif self._auto_colors:
