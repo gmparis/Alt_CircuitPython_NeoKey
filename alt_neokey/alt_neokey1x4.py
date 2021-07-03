@@ -91,10 +91,10 @@ class NeoKeyKey:
 
     .. sourcecode:: python
 
-        keys = NeoKey1x4(i2c) # used below
+        keys = NeoKey1x4(i2c, addr=[0x30, 0x31, 0x32])
 
         keys[0].color = 0xFF0000 # make red
-        keys[3].blink = True # start blinking
+        keys[11].blink = True # start blinking
 
         key = keys[0] # reference a NeoKeyKey instance
         key.color = 0xFF0000 # same as above example
