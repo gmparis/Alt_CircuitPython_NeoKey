@@ -257,9 +257,6 @@ class NeoKey1x4:
         )
         while True:
             neokey.read_keys()
-
-    .. autoclass:: NeoKey1x4
-        :members: blink_period, blink_on
     """
 
     # blink rate could be problematic depending on work load,
@@ -345,7 +342,8 @@ class NeoKey1x4:
 
     @property
     def brightness(self):
-        """Brightness value shared by all NeoKey LEDs."""
+        """Brightness value shared by all NeoKey LEDs.
+        :type: float"""
         return self._brightness
 
     @brightness.setter
@@ -376,6 +374,7 @@ class NeoKey1x4:
                         else:
                             neokey.auto_color = normal_mode
 
+        :type: function
         """
         return self._auto_color
 
@@ -394,7 +393,10 @@ class NeoKey1x4:
         """Automatic action function. Function is invoked on key press
         or release and is passed a single *NeoKeyEvent* as argument.
         The return value of this function is ignored.
-        Use *None* to remove a previously set function."""
+        Use *None* to remove a previously set function.
+
+        :type: function
+        """
         return self._auto_action
 
     @auto_action.setter
