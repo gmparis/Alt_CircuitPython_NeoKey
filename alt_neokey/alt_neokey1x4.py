@@ -258,14 +258,16 @@ class NeoKey1x4:
         while True:
             neokey.read_keys()
 
+    .. autoclass:: NeoKey1x4
+        :members: blink_period, blink_on
     """
 
     # blink rate could be problematic depending on work load,
     # processor power, and number of NeoKey modules, so the
     # parameters are set in the class in case the user wishes
     # to override them in their instance
-    blink_period = 20  #: blink period in tenths of a second
-    blink_on = 14  #: lit time per period in second tenths
+    blink_period = 20
+    blink_on = 14
 
     def _blink_now(self):
         """True when blink is in 'on' state."""
