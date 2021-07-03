@@ -46,7 +46,7 @@ i2c_bus = board.I2C()
 neokey = NeoKey1x4(
     i2c_bus,
     addr=MODULES,
-    auto_colors=my_colors,
+    auto_color=my_colors,
     blink=False,  # use blink selectively (default)
 )
 

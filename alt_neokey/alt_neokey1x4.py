@@ -137,7 +137,7 @@ class NeoKeyKey:
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
         Read-only property is *True* if the key is being pressed.
-        Does not invoke or otherwise affect **auto_colors** or **auto_action**.
+        Does not invoke or otherwise affect **auto_color** or **auto_action**.
 
         .. note:: The user is encouraged to use one or both of the **auto_**
             functions of *NeoKey1x4*, or process the list of events returned
@@ -191,7 +191,7 @@ class NeoKey1x4:
     :param ~busio.I2C i2c_bus: Bus the NeoKey is connected to
     :param int addr: I2C address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
-    :param function auto_colors: set colors when keys pressed/released
+    :param function auto_color: set colors when keys pressed/released
     :param function auto_action: run when keys pressed/released
     :param bool blink: blink all keys when they are not pressed
 
@@ -218,14 +218,14 @@ class NeoKey1x4:
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
-    to the *NeoKey1x4* constructor using the **auto_colors** parameter. The function
+    to the *NeoKey1x4* constructor using the **auto_color** parameter. The function
     will be called for each key press and key release event, as detected by
     the **read_keys()** method. That method will call the function with a single
     argument, a *NeoKeyEvent*.
 
     Similarly, to have **read_keys()** run arbitrary code whenever a key is pressed,
     use the *NeoKey1x4* constructor's **auto_action** parameter. Any return value
-    from the function will be ignored. As with **auto_colors**, it will be passed
+    from the function will be ignored. As with **auto_color**, it will be passed
     a single *NeoKeyEvent* argument when invoked.
 
     The **blink** parameter is provided to initially enable all keys to blink
@@ -236,7 +236,7 @@ class NeoKey1x4:
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a *RuntimeError* exception.
 
-    .. note:: The **auto_colors** function is used to initialize key colors
+    .. note:: The **auto_color** function is used to initialize key colors
         whenever it is set or changed (except when set to *None*).
         It is used with blink mode to establish the 'on' color in the on/off
         cycle. In contrast, the **auto_action** function can be relied upon
@@ -256,7 +256,7 @@ class NeoKey1x4:
         i2c = board.I2C()
         neokey = NeoKey1x4(
             i2c,
-            auto_colors=lambda e: 0xFFFFFF if e.pressed else 0
+            auto_color=lambda e: 0xFFFFFF if e.pressed else 0
         )
         while True:
             neokey.read_keys()
@@ -269,7 +269,7 @@ class NeoKey1x4:
         addr=_NEOKEY1X4_BASE_ADDR,
         *,
         brightness=0.2,
-        auto_colors=None,
+        auto_color=None,
         auto_action=None,
         blink=False,
     ):
@@ -313,7 +313,7 @@ class NeoKey1x4:
         self._keys = tuple(keys)
         self._brightness = float(brightness)
         self._key_bits = [0x0] * len(seesaws)
-        self.auto_colors = auto_colors
+        self.auto_color = auto_color
         self.auto_action = auto_action
 
     def __getitem__(self, key_num):
@@ -327,7 +327,7 @@ class NeoKey1x4:
 
     def fill(self, color):
         """Set all keys to the specified color.
-        Useful when setting key colors other than with **auto_colors**.
+        Useful when setting key colors other than with **auto_color**.
 
         :param int color: 24-bit color integer"""
         for pixel in self._pixels:
@@ -345,24 +345,24 @@ class NeoKey1x4:
             pixel.brightness = brightness
 
     @property
-    def auto_colors(self):
+    def auto_color(self):
         """Automatic color management function. Function is invoked on
         key press or release and is passed a single *NeoKeyEvent* as argument.
         The function must return a 24-bit RGB color integer.
         Use *None* to remove a previously set **auto_color** function.
         All keys are immediately set to their 'released' color whenever
         this parameter is set to a value other than *None*."""
-        return self._auto_colors
+        return self._auto_color
 
-    @auto_colors.setter
-    def auto_colors(self, function):
+    @auto_color.setter
+    def auto_color(self, function):
         if function is not None:
             if not callable(function):
-                raise TypeError("auto_colors value must be a function")
+                raise TypeError("auto_color value must be a function")
             for key_num in self:
                 # initialize to the released color
                 self._keys[key_num].color = function(NeoKeyEvent(key_num, False))
-        self._auto_colors = function
+        self._auto_color = function
 
     @property
     def auto_action(self):
@@ -384,7 +384,7 @@ class NeoKey1x4:
         via the I2C bus. Compare results with the last time
         this method was invoked in order to determine key events
         (presses and releases). For each event, **read_keys()** invokes
-        the optional **auto_colors** and **auto_action** functions with
+        the optional **auto_color** and **auto_action** functions with
         the describing *NeoKeyEvent* as sole argument. Returns a list
         of all the key events that occurred (type *NeoKeyEvent*)."""
         events = []
@@ -409,8 +409,8 @@ class NeoKey1x4:
                 for key_num in _bits_to_keys(index, bits):
                     key_event = NeoKeyEvent(key_num, pressed)
                     events.append(key_event)
-                    if self._auto_colors:
-                        self._keys[key_num].color = self._auto_colors(key_event)
+                    if self._auto_color:
+                        self._keys[key_num].color = self._auto_color(key_event)
                     if self._auto_action:
                         self._auto_action(key_event)
             if do_blink:
@@ -420,11 +420,11 @@ class NeoKey1x4:
         return events
 
     def _blink_key(self, key_num, state):
-        """If state *True*, turn on color using **auto_colors** or white; otherwise dark"""
+        """If state *True*, turn on color using **auto_color** or white; otherwise dark"""
         if not state:
             color = 0
-        elif self._auto_colors:
-            color = self._auto_colors(NeoKeyEvent(key_num, False))  # released
+        elif self._auto_color:
+            color = self._auto_color(NeoKeyEvent(key_num, False))  # released
             if not color:  # doesn't work if unpressed color is dark
                 color = 0xFFFFFF
         else:

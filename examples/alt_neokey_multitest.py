@@ -35,7 +35,7 @@ i2c_bus = board.I2C()
 neokey = NeoKey1x4(
     i2c_bus,
     addr=(0x30, 0x31),
-    auto_colors=my_colors,
+    auto_color=my_colors,
 )
 
 # report memory again

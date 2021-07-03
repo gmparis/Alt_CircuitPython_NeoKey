@@ -20,7 +20,7 @@ i2c_bus = board.I2C()
 neokey = NeoKey1x4(
     i2c_bus,
     addr=0x30,
-    auto_colors=lambda e: 0x00FF33 if e.pressed else 0x000000,
+    auto_color=lambda e: 0x00FF33 if e.pressed else 0x000000,
 )
 
 # report memory again
