@@ -206,13 +206,13 @@ class NeoKey1x4:
     as the **addr** argument.
 
     To use multiple modules together, supply a list or tuple of I2C addresses
-    as the **addr** argument. Up to eight modules can be supported
-    by solder-bridging the address selectors to give each board a unique
-    address. Key numbers will be assigned to the keys in the order of board
-    addresses in the list, first 0-3, second 4-7, ..., eighth 28-31.
-    (If you accidentally assemble your project with the modules not in
-    ascending address order, no worries! Just order them the same way
-    in the **addr** list and the keys will be numbered the way you want.)
+    as the **addr** argument. Sixteen modules can be supported by selectively
+    solder-bridging the four address selectors to give each board a unique
+    address, 0x30 through 0x3F. Key numbers will be assigned to the keys in
+    the order of board addresses in the list, first 0-3, second 4-7, ...,
+    sixteenth 60-63. (If you accidentally assemble your project with the
+    modules out of ascending address order, no worries! Just order them the
+    same way in the **addr** list; the keys will be numbered the way you want.)
 
     Keys may be referenced by indexing the *NeoKey1x4* instance. Each key is
     represented by a *NeoKeyKey* instance. See the section about that class
@@ -353,7 +353,22 @@ class NeoKey1x4:
         The function must return a 24-bit RGB color integer.
         Use *None* to remove a previously set **auto_color** function.
         All keys are immediately set to their 'released' color whenever
-        this parameter is set to a value other than *None*."""
+        this parameter is set to a value other than *None*.
+
+        The code snippet below, taken from one of the example programs,
+        shows key 0 being used to toggle between two key-color modes.
+
+        .. sourcecode:: python
+
+            while True:
+                for event in neokey.read_keys():
+                    if event.pressed and event.key_num == 0:
+                        if neokey.auto_color is normal_mode:
+                            neokey.auto_color = special_mode
+                        else:
+                            neokey.auto_color = normal_mode
+
+        """
         return self._auto_color
 
     @auto_color.setter

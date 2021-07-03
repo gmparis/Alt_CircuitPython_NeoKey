@@ -2,12 +2,18 @@
 #
 # SPDX-License-Identifier: MIT
 
+# A fanciful example that shows two NeoKey 1x4 keypads
+# being used to alert on the status of critical ship
+# systems. Because the auto_action function needs to
+# reference the NeoKey1x4 instance, the function is
+# defined after the constructor and put into effect
+# using the auto_action property.
+
 from collections import namedtuple
 from random import randrange
 import gc
 import board
 
-# This example is more fun than the rest!
 print("Alternative API NeoKey blink test")
 
 # report memory before instantiating NeoKey1x4

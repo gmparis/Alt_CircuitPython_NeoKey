@@ -2,6 +2,16 @@
 #
 # SPDX-License-Identifier: MIT
 
+# This example shows use of a function called via the
+# auto_action feature. This example is trivial, but
+# a more real use might be to use an audio device to
+# make a sound when a key is pressed.
+#
+# Any code can be put into the auto_function, but for
+# readability, it might be best to keep the primary thrust
+# of your program in the main loop, using the auto_action
+# function for "housekeeping".
+
 from time import sleep
 import gc
 import board

@@ -2,6 +2,13 @@
 #
 # SPDX-License-Identifier: MIT
 
+# Basic test of a single NeoKey 1x4 board. Some sleeps
+# are in the demo to give a feel for real work being done.
+# The more work your program does, the slower the keys
+# will be to respond. Fortunately, this board uses I2C,
+# so it will be easy to interface with a faster processor
+# if you need to.
+
 from time import sleep
 import gc
 import board

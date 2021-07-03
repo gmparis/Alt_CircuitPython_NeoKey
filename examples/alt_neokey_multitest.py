@@ -2,6 +2,15 @@
 #
 # SPDX-License-Identifier: MIT
 
+# This example shows how easy it is to use more than
+# one NeoKey 1x4 module in a group. To use it, you will
+# need to have two modules! And one needs to have the
+# A0 bridge soldered, resulting in address 0x31. If that's
+# not your case, adjust the code below as needed. If you
+# have more than two modules, give them all unique addresses
+# by bridging different address bits (range is 0x30 to 0x3f),
+# then list them all in the addr tuple below.
+
 from time import sleep
 import gc
 import board

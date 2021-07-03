@@ -10,16 +10,25 @@ Ensure your device works with this simple test.
 Multi-test
 -----------
 
-Ensure multiple devices work with multitest.
+Ensure two NeoKey devices can work together.
 
 .. literalinclude:: ../examples/alt_neokey_multitest.py
     :caption: examples/alt_neokey_multitest.py
     :linenos:
 
+Color-mode test
+----------------
+
+Alternate between two key-color modes by pressing a key.
+
+.. literalinclude:: ../examples/alt_neokey_colormodetest.py
+    :caption: examples/alt_neokey_colormodetest.py
+    :linenos:
+
 Action test
 ------------
 
-Enable automatic actions on your devices with action test.
+Demonstrate automatic actions.
 
 .. literalinclude:: ../examples/alt_neokey_actiontest.py
     :caption: examples/alt_neokey_actiontest.py
