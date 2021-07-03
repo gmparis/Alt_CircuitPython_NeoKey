@@ -141,7 +141,7 @@ class NeoKeyKey:
 
         .. note:: The user is encouraged to use one or both of the **auto_**
             functions of *NeoKey1x4*, or process the list of events returned
-            by *NeoKey1x4*'s **read_keys()** method, rather than using
+            by *NeoKey1x4*'s **read()** method, rather than using
             **pressed** to regularly check key state. Those approaches are
             more efficient users of the I2C bus than is **pressed**. However,
             if **pressed** is suitable to your needs, you should consider
@@ -217,16 +217,16 @@ class NeoKey1x4:
     loop, create a function that returns a color (24-bit RGB) and pass it
     to the *NeoKey1x4* constructor using the **auto_color** parameter. The function
     will be called for each key press and key release event, as detected by
-    the **read_keys()** method. That method will call the function with a single
+    the **read()** method. That method will call the function with a single
     argument, a *NeoKeyEvent*.
 
-    Similarly, to have **read_keys()** run arbitrary code whenever a key is pressed,
+    Similarly, to have **read()** run arbitrary code whenever a key is pressed,
     use the *NeoKey1x4* constructor's **auto_action** parameter. Any return value
     from the function will be ignored. As with **auto_color**, it will be passed
     a single *NeoKeyEvent* argument when invoked.
 
     The **blink** parameter is provided to initially enable all keys to blink
-    while not being pressed, as sensed by **read_keys()**. Keys may be set
+    while not being pressed, as sensed by **read()**. Keys may be set
     individually to blink or not blink using their **blink** property,
     regardless of the **blink** value passed to the *NeoKey1x4* constructor.
     The blink feature requires **time.monotonic_ns()**, which is not available
@@ -256,7 +256,7 @@ class NeoKey1x4:
             auto_color=lambda e: 0xFFFFFF if e.pressed else 0
         )
         while True:
-            neokey.read_keys()
+            neokey.read()
     """
 
     # blink rate could be problematic depending on work load,
@@ -366,7 +366,7 @@ class NeoKey1x4:
         .. sourcecode:: python
 
             while True:
-                for event in neokey.read_keys():
+                for event in neokey.read():
                     if event.pressed and event.key_num == 0:
                         if neokey.auto_color is normal_mode:
                             neokey.auto_color = special_mode
@@ -401,11 +401,11 @@ class NeoKey1x4:
                 raise TypeError("auto_action value must be a function")
         self._auto_action = function
 
-    def read_keys(self):
+    def read(self):
         """Query the status of all keys on all NeoKey modules
         via the I2C bus. Compare results with the last time
         this method was invoked in order to determine key events
-        (presses and releases). For each event, **read_keys()** invokes
+        (presses and releases). For each event, **read()** invokes
         the optional **auto_color** and **auto_action** functions with
         the describing *NeoKeyEvent* as sole argument. Returns a list
         of all the key events that occurred (type *NeoKeyEvent*)."""

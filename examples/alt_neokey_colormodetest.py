@@ -25,7 +25,7 @@ i2c = board.I2C()
 neokey = NeoKey1x4(i2c, auto_color=normal_mode)
 
 while True:
-    for event in neokey.read_keys():
+    for event in neokey.read():
         if event.pressed and event.key_num == 0:
             if neokey.auto_color is normal_mode:
                 neokey.auto_color = special_mode

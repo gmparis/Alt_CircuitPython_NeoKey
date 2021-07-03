@@ -88,4 +88,4 @@ print(f"Memory: After: alloc={used2} free={free2} delta={delta}")
 # All of the simulated work sleeps have been removed in this example
 # to demonstrate the best-case performance.
 while True:
-    neokey.read_keys()
+    neokey.read()

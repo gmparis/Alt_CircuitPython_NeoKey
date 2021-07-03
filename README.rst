@@ -73,7 +73,7 @@ Usage Example
 
    # set colors in main loop by processing event list
    while True:
-      for event in neokey.read_keys():
+      for event in neokey.read():
          if event.pressed:
             neokey[event.key_num].color = 0x0000FF
          else:

@@ -38,7 +38,7 @@ print(f"Memory: After: alloc={used2} free={free2} delta={delta}")
 # Read keys, process any events
 # if you want responsive keys, you can't spend much time doing work!
 while True:
-    events = neokey.read_keys()
+    events = neokey.read()
     for event in events:
         if event.pressed:
             print(f"key {event.key_num} pressed")
