@@ -542,34 +542,45 @@ class NeoKey1x4:
         return events
 
     def read_event(self):
-        """Similar to **read()**, but queries one NeoKey module
-        at a time. If there are events from that module, yields
-        them *one event at a time*. Then continues to the next
-        module, starting over with the first after the last.
-        It does this in a forever loop, elminating the need
-        for a ``while True:`` in the main loop.
+        """Similar to **read()** in its calling of **auto_**
+        functions and managing **blink**, but uses a different approach
+        to gathering and returning events.
+
+        This method queries one NeoKey module at a time. If there are
+        events from that module, yields those events back to the caller
+        *one event at a time*. On the next call, it starts where it left
+        off. It continues to the next module, starting over with the
+        first after the last, looping forever. The forever loop and the
+        yielding of one event at a time eliminate the need for one or
+        two loops in the main program.
 
         The principal advantage of **read_event()** over **read()**
-        is latency fairness. With **read()**, the first NeoKey
-        module gets quicker response because **auto_color**,
+        is latency fairness. With **read()**, the first NeoKey module
+        gets quicker response than the last because **auto_color**,
         **auto_action** and **blink** are processed in module
-        and key order. With **read_event()**, latency is shared
-        evenly because each time it is called, it picks up from
-        where it left off.
+        and key order. (This effect could be present also in your
+        main program, if it processes the event list in order.)
+        With **read_event()**, latency is shared evenly because it
+        always picks up from where it left off.
+
+        Depending on your application, latency differences might be
+        insignificant or unimportant. In those cases, you probably
+        should use **read()**, as it allows for more flexibility in
+        the main program.
+
+        .. note:: A possibly critical disadvantage of using
+            **read_event()** is that it *never* returns to the caller
+            until it detects an event. If you expect to perform
+            processing in your main program when keys are *not* being
+            actuated, you must use **read()**.
 
         Here is an example of using **read_event()**.
 
         .. sourcecode:: python
 
-            # no need for "while True:"
+            # no need for "while True:" or "for event in events:"
             for event in neokey.read_event():
                 ... # your event processing code goes here
-
-        .. note:: A possibly critical disadvantage of using
-        **read_event()** is that it *never* returns to the main loop
-        unless it detects an event. If you expect to perform processing
-        in your main loop when keys are *not* being actuated, you must
-        use **read()**.
 
         """
 
