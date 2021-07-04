@@ -34,15 +34,15 @@ try:
     from time import monotonic_ns
 except ImportError:
 
-    def _blink_check(fatal=True):
+    def _time_ops_check(fatal=True):
         if fatal:
-            raise RuntimeError("blink requires monotonic_ns")
+            raise RuntimeError("feature requires monotonic_ns")
         return False
 
 
 else:
 
-    def _blink_check(ignored=True):  # pylint: disable=unused-argument
+    def _time_ops_check(ignored=True):  # pylint: disable=unused-argument
         return True
 
 
@@ -111,7 +111,7 @@ class NeoKeyKey:
         self._pixel = pixel
         self._key_num = int(key_num)
         if blink:
-            _blink_check()  # to exception if necessary
+            _time_ops_check()  # to exception if necessary
         self._blink = bool(blink)
 
     def __lt__(self, other):
@@ -161,7 +161,7 @@ class NeoKeyKey:
     def blink(self, blink):
         blink = bool(blink)
         if blink:
-            _blink_check()  # to exception if necessary
+            _time_ops_check()  # to exception if necessary
         self._blink = blink
 
 
@@ -277,7 +277,7 @@ class NeoKey1x4:
         except TypeError:
             addr = (addr,)
         if blink:
-            _blink_check()  # to exception if necessary
+            _time_ops_check()  # to exception if necessary
         self._blink_state = True  # lights on
         seesaws = []
         pixels = []
@@ -395,7 +395,7 @@ class NeoKey1x4:
     def _blink_now(self):
         """Determine if now is the time to blink."""
         do_blink = False
-        if _blink_check(False):  # non-fatal check
+        if _time_ops_check(False):  # non-fatal check
             blink_wanted = self._blink_clock()
             if blink_wanted != self._blink_state:
                 do_blink = True
@@ -531,10 +531,12 @@ class NeoKey1x4:
             events.extend(self._read_module(index, seesaw, do_blink))
         return events
 
-    def read_event(self):
+    def read_event(self, *, timeout=0):
         """Similar to **read()** in its calling of **auto_**
         functions and managing **blink**, but uses a different approach
         to gathering and returning events.
+
+        :param int timeout: yield *None* if no key activity in 10ths of a second
 
         This method queries one NeoKey module at a time. If there are
         events from that module, yields those events back to the caller
@@ -546,34 +548,56 @@ class NeoKey1x4:
         is latency fairness. With **read()**, the first NeoKey module
         gets quicker response than the last because **auto_color**,
         **auto_action** and **blink** are processed in module
-        and key order. (This effect could be present also in your
+        and key order. (This effect also could be present in your
         main program, if it processes the event list in order.)
         With **read_event()**, latency is shared evenly because it
         always picks up from where it left off.
 
+        .. note:: A possibly critical disadvantage of using
+            **read_event()** is that it does not return to the caller
+            until it detects an event.
+
+            To overcome this behavior, use the **timeout** parameter
+            to cause **read_event()** to return *None* whenever the
+            specified time has elapsed without a key event. As with
+            **blink**, **timeout** is supported only when the board
+            supports **time.monotonic_ns()**.
+
         Depending on your application, latency differences might be
         insignificant or unimportant. In those cases, you probably
         should use **read()**, as it allows for more flexibility in
-        the main program.
+        the main program, given that the **timeout** feature is not
+        universally supported.
 
-        .. note:: A possibly critical disadvantage of using
-            **read_event()** is that it *never* returns to the caller
-            until it detects an event. If you expect to perform
-            processing in your main program when keys are *not* being
-            actuated, you must use **read()**.
-
-        Here is an example of using **read_event()**.
+        Here is an example of using **read_event()** with a timeout
+        of three tenths of a second.
 
         .. sourcecode:: python
 
             # no need for "while True:"
-            for event in neokey.read_event():
-                ... # your event processing code goes here
+            for event in neokey.read_event(timeout=3):
+                if event is not None:
+                    ... # handle key event here
+                ... # do other tasks
 
         """
 
+        if timeout:
+            _time_ops_check()  # fatal if not supported
+            timeout = int(timeout)
+            if timeout < 0:
+                raise ValueError("negative timeout")
+            last_event = monotonic_ns()
         while True:
             do_blink = self._blink_now()
             for index, seesaw in enumerate(self._seesaws):
+                if timeout:
+                    now = monotonic_ns()
                 for event in self._read_module(index, seesaw, do_blink):
+                    if timeout:
+                        last_event = now
                     yield event
+                if timeout:
+                    if (now - last_event) // 100_000_000 >= timeout:
+                        last_event = now
+                        yield None  # no events sentinel

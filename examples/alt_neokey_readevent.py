@@ -87,9 +87,18 @@ delta = used2 - used1
 print(f"Memory: After: alloc={used2} free={free2} delta={delta}")
 
 # With read_event(), we no longer need a "while True:".
-# **BUT** read_event() never returns without an event,
+# But, by default, read_event() doesn't return without an event,
 # so no processing can happen unless a key is pressed or
 # released. Depending on your application, this is either
-# perfectly fine or is a fatal flaw.
-for event in neokey.read_event():
-    print(event)
+# perfectly fine or is a critical flaw.
+#
+# To overcome this issue, specify a timeout in 10ths of a
+# second, as done below. This will cause read_event() to
+# return None after the specified number of second tenths
+# has elapsed with no key presses or releases. The timeout
+# in this example is one second.
+for event in neokey.read_event(timeout=10):
+    if event is None:
+        print("got timeout")
+    else:
+        print(event)
