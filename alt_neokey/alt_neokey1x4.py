@@ -403,13 +403,87 @@ class NeoKey1x4:
         self._auto_action = function
 
     def read(self):
-        """Query the status of all keys on all NeoKey modules
-        via the I2C bus. Compare results with the last time
-        this method was invoked in order to determine key events
-        (presses and releases). For each event, **read()** invokes
-        the optional **auto_color** and **auto_action** functions with
-        the describing *NeoKeyEvent* as sole argument. Returns a list
-        of all the key events that occurred (type *NeoKeyEvent*)."""
+        """At the most basic level, **read()** queries all keys via
+        the I2C bus. It compares the states of the keys to the previous
+        time it was run. From that comparison, it generates an event
+        list. Each event in that list corresponds to a key press or
+        key release. This is not the same as the current state of a
+        key, as a key that was neither pressed nor released since the
+        last **read()** will not have an event in the list. (To get
+        the current state of a key, use its **pressed** property.)
+        Each event in the list is a *NeoKeyEvent* instance. The return
+        value is this list.
+
+        The following code snippet, adapted from the *simpletest* example,
+        demonstrates responding to the event list returned by **read()**.
+
+        .. sourcecode:: python
+
+            while True:
+                for event in neokey.read():
+                    if event.pressed:
+                        print(f"key {event.key_num} pressed")
+                        do_something_useful()
+                    else:
+                        print(f"key {event.key_num} released")
+
+        The NeoKey module has an RGB LED under each key. Many uses would
+        have the keys change colors when keys are pressed and released.
+        This can be achieved in your main loop, but cluttering up the
+        main loop with key-color management will make it harder to see
+        the code that's there for the main purpose of your program.
+
+        Instead, define a function that returns a color based on (or
+        ignoring) the single *NeoKeyEvent* argument that will be passed
+        to the function when it is invoked. Then, either as an argument
+        to the *NeoKey1x4* constructor or by using its **auto_color**
+        property, you inform the *NeoKey1x4* to use this function to
+        set key colors. It will invoke the function on key press and
+        key release events, setting the color of the key in question.
+
+        This function in many cases is so simple that it can be expressed
+        as a *lambda*, as in the code snippet below, which sets the
+        key color to red when pressed and off when released.
+
+        .. sourcecode:: python
+
+            neokey.auto_color = lambda e: 0xFF0000 if e.pressed else 0
+
+        Another thing *NeoKey1x4* can do for you is blink your keys.
+        For example, to signal an alert condition associated with a
+        key, the **blink** property of that key could be set to *True*.
+        Each time **read()** is run, it checks to see whether the key
+        should change from 'off' to 'on' or vice versa and takes care
+        of it.
+
+        .. sourcecode:: python
+
+            neokey[2].blink = True # sets key 2 blinking
+
+        Finally, similar to **auto_color**, **read()** can execute a
+        function every time a key is pressed or released. This
+        can be set in an argument to the *NeoKey1x4* constructor
+        or it can be specified using the **auto_action** property.
+
+        Although there is no limitation on uses for this function, a
+        suggestion is to use it for other housekeeping functions,
+        such as key-clicks, haptic feedback, key logging, etc. This
+        would allow you to keep such code separate from the main thrust
+        of your program, which would be in your main loop. Any return
+        value from the **auto_action** function will be ignored.
+
+        .. sourcecode:: python
+
+            def sound_on_pressed(kev):
+                if kev.pressed:
+                    if kev.key_num == 0:
+                        my_ring_bell()
+                    else:
+                        my_key_click()
+
+            neokey.auto_action = sound_on_pressed
+        """
+
         events = []
         do_blink = False
         if _blink_check(False):  # non-fatal check
