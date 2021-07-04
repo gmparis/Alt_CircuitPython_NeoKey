@@ -137,17 +137,7 @@ class NeoKeyKey:
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
         Read-only property is *True* if the key is being pressed.
-        Does not invoke or otherwise affect **auto_color** or **auto_action**.
-
-        .. note:: The user is encouraged to use one or both of the **auto_**
-            functions of *NeoKey1x4*, or process the list of events returned
-            by *NeoKey1x4*'s **read()** method, rather than using
-            **pressed** to regularly check key state. Those approaches are
-            more efficient users of the I2C bus than is **pressed**. However,
-            if **pressed** is suitable to your needs, you should consider
-            using the standard NeoKey module instead of this alternative.
-
-        """
+        Does not invoke or affect **auto_color** or **auto_action**."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
@@ -550,9 +540,7 @@ class NeoKey1x4:
         events from that module, yields those events back to the caller
         *one event at a time*. On the next call, it starts where it left
         off. It continues to the next module, starting over with the
-        first after the last, looping forever. The forever loop and the
-        yielding of one event at a time eliminate the need for one or
-        two loops in the main program.
+        first after the last, looping forever.
 
         The principal advantage of **read_event()** over **read()**
         is latency fairness. With **read()**, the first NeoKey module
@@ -578,7 +566,7 @@ class NeoKey1x4:
 
         .. sourcecode:: python
 
-            # no need for "while True:" or "for event in events:"
+            # no need for "while True:"
             for event in neokey.read_event():
                 ... # your event processing code goes here
 
