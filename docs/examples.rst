@@ -42,3 +42,12 @@ Enable automatic blinking on select keys.
 .. literalinclude:: ../examples/alt_neokey_blinktest.py
     :caption: examples/alt_neokey_blinktest.py
     :linenos:
+
+Read Event test
+----------------
+
+Same as blink test, but uses read_event() instead of read().
+
+.. literalinclude:: ../examples/alt_neokey_readevent.py
+    :caption: examples/alt_neokey_readevent.py
+    :linenos:

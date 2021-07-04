@@ -267,7 +267,7 @@ class NeoKey1x4:
     blink_period = 20
     blink_on = 14
 
-    def _blink_now(self):
+    def _blink_clock(self):
         """True when blink is in 'on' state."""
         return (monotonic_ns() // 100_000_000) % self.blink_period < self.blink_on
 
@@ -402,6 +402,57 @@ class NeoKey1x4:
                 raise TypeError("auto_action value must be a function")
         self._auto_action = function
 
+    def _blink_now(self):
+        """Determine if now is the time to blink."""
+        do_blink = False
+        if _blink_check(False):  # non-fatal check
+            blink_wanted = self._blink_clock()
+            if blink_wanted != self._blink_state:
+                do_blink = True
+                self._blink_state = blink_wanted
+        return do_blink
+
+    def _blink_key(self, key_num, state):
+        """If state *True*, turn on color using **auto_color** or white; otherwise dark"""
+        if not state:
+            color = 0
+        elif self._auto_color:
+            color = self._auto_color(NeoKeyEvent(key_num, False))  # released
+            if not color:  # doesn't work if unpressed color is dark
+                color = 0xFFFFFF
+        else:
+            color = 0xFFFFFF
+        self._keys[key_num].color = color
+
+    def _read_module(self, index, seesaw, do_blink):
+        """Common code for **read()** and **read_event()**.
+        Reads one module, executes **auto_** functions. Blinks.
+        Returns event list."""
+        events = []
+        previous = self._key_bits[index]
+        # due to pull-ups, pressing a key sets its bit to 0
+        unpressed_bits = key_bits = seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
+        key_bits ^= _NEOKEY1X4_KEYMASK  # invert
+        key_bits &= _NEOKEY1X4_KEYMASK  # re-mask
+        just = (
+            (True, (key_bits ^ previous) & key_bits),
+            (False, (key_bits ^ previous) & ~key_bits),
+        )
+        self._key_bits[index] = key_bits
+        for pressed, bits in just:
+            for key_num in _bits_to_keys(index, bits):
+                key_event = NeoKeyEvent(key_num, pressed)
+                events.append(key_event)
+                if self._auto_color:
+                    self._keys[key_num].color = self._auto_color(key_event)
+                if self._auto_action:
+                    self._auto_action(key_event)
+        if do_blink:
+            for key_num in _bits_to_keys(index, unpressed_bits):
+                if self._keys[key_num].blink:
+                    self._blink_key(key_num, self._blink_state)
+        return events
+
     def read(self):
         """At the most basic level, **read()** queries all keys via
         the I2C bus. It compares the states of the keys to the previous
@@ -485,45 +536,45 @@ class NeoKey1x4:
         """
 
         events = []
-        do_blink = False
-        if _blink_check(False):  # non-fatal check
-            blink_wanted = self._blink_now()
-            if blink_wanted != self._blink_state:
-                do_blink = True
-                self._blink_state = blink_wanted
+        do_blink = self._blink_now()
         for index, seesaw in enumerate(self._seesaws):
-            previous = self._key_bits[index]
-            # due to pull-ups, pressing a key sets its bit to 0
-            unpressed_bits = key_bits = seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
-            key_bits ^= _NEOKEY1X4_KEYMASK  # invert
-            key_bits &= _NEOKEY1X4_KEYMASK  # re-mask
-            just = (
-                (True, (key_bits ^ previous) & key_bits),
-                (False, (key_bits ^ previous) & ~key_bits),
-            )
-            self._key_bits[index] = key_bits
-            for pressed, bits in just:
-                for key_num in _bits_to_keys(index, bits):
-                    key_event = NeoKeyEvent(key_num, pressed)
-                    events.append(key_event)
-                    if self._auto_color:
-                        self._keys[key_num].color = self._auto_color(key_event)
-                    if self._auto_action:
-                        self._auto_action(key_event)
-            if do_blink:
-                for key_num in _bits_to_keys(index, unpressed_bits):
-                    if self._keys[key_num].blink:
-                        self._blink_key(key_num, blink_wanted)
+            events.extend(self._read_module(index, seesaw, do_blink))
         return events
 
-    def _blink_key(self, key_num, state):
-        """If state *True*, turn on color using **auto_color** or white; otherwise dark"""
-        if not state:
-            color = 0
-        elif self._auto_color:
-            color = self._auto_color(NeoKeyEvent(key_num, False))  # released
-            if not color:  # doesn't work if unpressed color is dark
-                color = 0xFFFFFF
-        else:
-            color = 0xFFFFFF
-        self._keys[key_num].color = color
+    def read_event(self):
+        """Similar to **read()**, but queries one NeoKey module
+        at a time. If there are events from that module, yields
+        them *one event at a time*. Then continues to the next
+        module, starting over with the first after the last.
+        It does this in a forever loop, elminating the need
+        for a ``while True:`` in the main loop.
+
+        The principal advantage of **read_event()** over **read()**
+        is latency fairness. With **read()**, the first NeoKey
+        module gets quicker response because **auto_color**,
+        **auto_action** and **blink** are processed in module
+        and key order. With **read_event()**, latency is shared
+        evenly because each time it is called, it picks up from
+        where it left off.
+
+        Here is an example of using **read_event()**.
+
+        .. sourcecode:: python
+
+            # no need for "while True:"
+            for event in neokey.read_event():
+                ... # your event processing code goes here
+
+        .. note:: A possibly critical disadvantage of using
+        **read_event()** is that it *never* returns to the main loop
+        unless it detects an event. If you expect to perform processing
+        in your main loop when keys are *not* being actuated, you must
+        use **read()**.
+
+        """
+
+        while True:
+            do_blink = self._blink_now()
+            for index, seesaw in enumerate(self._seesaws):
+                for event in self._read_module(index, seesaw, do_blink):
+                    yield event
