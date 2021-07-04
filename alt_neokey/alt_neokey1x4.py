@@ -470,8 +470,8 @@ class NeoKey1x4:
 
         The NeoKey module has an RGB LED under each key. Many uses would
         have the keys change colors when keys are pressed and released.
-        This can be achieved in your main loop, but cluttering up the
-        main loop with key-color management will make it harder to see
+        This can be achieved in your main program, but cluttering it up
+        with key-color management will make it harder to see
         the code that's there for the main purpose of your program.
 
         Instead, define a function that returns a color based on (or
@@ -510,8 +510,8 @@ class NeoKey1x4:
         suggestion is to use it for other housekeeping functions,
         such as key-clicks, haptic feedback, key logging, etc. This
         would allow you to keep such code separate from the main thrust
-        of your program, which would be in your main loop. Any return
-        value from the **auto_action** function will be ignored.
+        of your program. Any return value from the **auto_action**
+        function will be ignored.
 
         .. sourcecode:: python
 
