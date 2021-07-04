@@ -3,7 +3,7 @@ Introduction
 
 
 .. image:: https://readthedocs.org/projects/alt-circuitpython-neokey/badge/?version=latest
-    :target: https://circuitpython-neokey.readthedocs.io/
+    :target: https://alt-circuitpython-neokey.readthedocs.io/
     :alt: Documentation Status
 
 
