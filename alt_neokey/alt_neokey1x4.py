@@ -65,7 +65,7 @@ _NEOKEY1X4_KEYMASK = const(
 _NEOKEY1X4_KEYS = (_NEOKEY1X4_KEY0, _NEOKEY1X4_KEY1, _NEOKEY1X4_KEY2, _NEOKEY1X4_KEY3)
 _NEOKEY1X4_COUNT = const(4)
 
-NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed")
+NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed".split())
 """Event list element.
 
     :param int key_num: key number. 0-3 on first NeoKey, 4-7 on second, etc.
