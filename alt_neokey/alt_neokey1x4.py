@@ -413,15 +413,17 @@ class NeoKey1x4:
         return do_blink
 
     def _blink_key(self, key_num, state):
-        """If state *True*, turn on color using **auto_color** or white; otherwise dark"""
+        """If state *True*, turn on color using **auto_color**, preferring released color,
+        then pressed color. If both colors are 0 (off), or if no **auto_color**, use white."""
         if not state:
-            color = 0
+            color = 0  # off is always off
         elif self._auto_color:
-            color = self._auto_color(NeoKeyEvent(key_num, False))  # released
-            if not color:  # doesn't work if unpressed color is dark
-                color = 0xFFFFFF
-        else:
-            color = 0xFFFFFF
+            color = 0xFFFFFF  # on is default white
+            for pressed in (False, True):
+                action_color = self._auto_color(NeoKeyEvent(key_num, pressed))
+                if action_color:
+                    color = action_color
+                    break
         self._keys[key_num].color = color
 
     def _read_module(self, index, seesaw, do_blink):
