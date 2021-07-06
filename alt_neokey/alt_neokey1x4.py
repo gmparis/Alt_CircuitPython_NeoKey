@@ -79,7 +79,7 @@ NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed".split())
 """Event list element.
 
     :param int key_num: key number. 0-3 on first NeoKey, 4-7 on second, etc.
-    :param bool pressed: *True* for key press event; *False* for key release event."""
+    :param bool pressed: True for key press event; False for key release event."""
 
 # pylint: disable=missing-docstring
 
@@ -89,14 +89,14 @@ class NeoKeyKey:
 
     :param ~Seesaw.seesaw seesaw: NeoKey Seesaw
     :param ~Seesaw.neopixel pixel: NeoKey NeoPixel
-    :param int key_num: key number assigned by *NeoKey1x4*
+    :param int key_num: key number assigned by :class:`NeoKey1x4`
 
     The constructor for this class is not intended to be invoked
-    by anything other than *NeoKey1x4*. One *NeoKeyKey* instance
-    is created by *NeoKey1x4* for each key. Keys are numbered 0-3
+    by anything other than :class:`NeoKey1x4`. One :class`NeoKeyKey` instance
+    is created by :class:`NeoKey1x4` for each key. Keys are numbered 0-3
     on the first NeoKey module. 4-7 on the second, etc.
 
-    These instances can be referenced by indexing a *NeoKey1x4*
+    These instances can be referenced by indexing a :class:`NeoKey1x4`
     object, as shown in the examples below.
 
     .. sourcecode:: python
@@ -140,13 +140,13 @@ class NeoKeyKey:
 
     @property
     def key_num(self):
-        """Integer key number assigned by *NeoKey1x4*. Read-only."""
+        """Integer key number assigned by :class:`NeoKey1x4`. Read-only."""
         return self._key_num
 
     @property
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
-        Read-only property is *True* if the key is being pressed.
+        Read-only property is True if the key is being pressed.
         Does not invoke or affect **auto_color** or **auto_action**."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
@@ -164,7 +164,7 @@ class NeoKeyKey:
 
     @property
     def blink(self):
-        """Read-write boolean property, *True* when key is blinking."""
+        """Read-write boolean property, True when key is blinking."""
         return self._blink
 
     @blink.setter
@@ -210,32 +210,32 @@ class NeoKey1x4:
     modules out of ascending address order, no worries! Just order them the
     same way in the **addr** list; the keys will be numbered the way you want.)
 
-    Keys may be referenced by indexing the *NeoKey1x4* instance. Each key is
-    represented by a *NeoKeyKey* instance. See the section about that class
+    Keys may be referenced by indexing the :class:`NeoKey1x4` instance. Each key is
+    represented by a :class:`NeoKeyKey` instance. See the section about that class
     for its attributes.
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
-    to the *NeoKey1x4* constructor using the **auto_color** parameter. The function
+    to the :class:`NeoKey1x4` constructor using the **auto_color** parameter. The function
     will be called for each key press and key release event, as detected by
     the **read()** method. That method will call the function with a single
-    argument, a *NeoKeyEvent*.
+    argument, a :class:`NeoKeyEvent`.
 
     Similarly, to have **read()** run arbitrary code whenever a key is pressed,
-    use the *NeoKey1x4* constructor's **auto_action** parameter. Any return value
+    use the :class:`NeoKey1x4` constructor's **auto_action** parameter. Any return value
     from the function will be ignored. As with **auto_color**, it will be passed
-    a single *NeoKeyEvent* argument when invoked.
+    a single :class:`NeoKeyEvent` argument when invoked.
 
     The **blink** parameter is provided to initially enable all keys to blink
     while not being pressed, as sensed by **read()**. Keys may be set
     individually to blink or not blink using their **blink** property,
-    regardless of the **blink** value passed to the *NeoKey1x4* constructor.
+    regardless of the **blink** value passed to the :class:`NeoKey1x4` constructor.
     The blink feature requires **time.monotonic_ns()**, which is not available
     on some boards. In that case, the feature is disabled and attempting
     to use it will raise a :class:`RuntimeError` exception.
 
     .. note:: The **auto_color** function is used to initialize key colors
-        whenever it is set or changed (except when set to *None*).
+        whenever it is set or changed (except when set to None).
         It is used with blink mode to establish the 'on' color in the on/off
         cycle. In contrast, the **auto_action** function can be relied upon
         to be called only on key press and key release events.
@@ -326,15 +326,15 @@ class NeoKey1x4:
 
     @classmethod
     def all(cls, i2c_bus, **kargs):
-        """Find all *NeoKey1x4* devices on the bus and create a *NeoKey1x4*
+        """Find all :class:`NeoKey1x4` devices on the bus and create a :class:`NeoKey1x4`
         instance using all of them, in ascending i2c address order. Returns
         the new instance.
 
-        :param ~busio.I2C i2c_bus: bus connecting the *NeoKey1x4* module(s)
+        :param ~busio.I2C i2c_bus: bus connecting the :class:`NeoKey1x4` module(s)
         :param int base: lowest i2c address (default 0x30)
         :param int last: highest i2c address (default 0x3F)
 
-        Any other named parameters are passed onto the *NeoKey1x4* constructor.
+        Any other named parameters are passed onto the :class:`NeoKey1x4` constructor.
 
         Raises :class:`RuntimeError` exception if no modules found."""
 
@@ -392,11 +392,11 @@ class NeoKey1x4:
     @property
     def auto_color(self):
         """Automatic color management function. Function is invoked on
-        key press or release and is passed a single *NeoKeyEvent* as argument.
+        key press or release and is passed a single :class:`NeoKeyEvent` as argument.
         The function must return a 24-bit RGB color integer.
-        Use *None* to remove a previously set **auto_color** function.
+        Use None to remove a previously set **auto_color** function.
         All keys are immediately set to their 'released' color whenever
-        this parameter is set to a value other than *None*.
+        this parameter is set to a value other than None.
 
         The code snippet below, taken from one of the example programs,
         shows key 0 being used to toggle between two key-color modes.
@@ -427,9 +427,9 @@ class NeoKey1x4:
     @property
     def auto_action(self):
         """Automatic action function. Function is invoked on key press
-        or release and is passed a single *NeoKeyEvent* as argument.
+        or release and is passed a single :class:`NeoKeyEvent` as argument.
         The return value of this function is ignored.
-        Use *None* to remove a previously set function."""
+        Use None to remove a previously set function."""
         return self._auto_action
 
     @auto_action.setter
@@ -450,7 +450,7 @@ class NeoKey1x4:
         return do_blink
 
     def _blink_key(self, key_num, state):
-        """If state *True*, turn on color using **auto_color**, preferring released color,
+        """If state True, turn on color using **auto_color**, preferring released color,
         then pressed color. If both colors are 0 (off), or if no **auto_color**, use white."""
         if not state:
             color = 0  # off is always off
@@ -501,7 +501,7 @@ class NeoKey1x4:
         key, as a key that was neither pressed nor released since the
         last **read()** will not have an event in the list. (To get
         the current state of a key, use its **pressed** property.)
-        Each event in the list is a *NeoKeyEvent* instance. The return
+        Each event in the list is a :class:`NeoKeyEvent` instance. The return
         value is this list.
 
         The following code snippet, adapted from the *simpletest* example,
@@ -524,10 +524,10 @@ class NeoKey1x4:
         the code that's there for the main purpose of your program.
 
         Instead, define a function that returns a color based on (or
-        ignoring) the single *NeoKeyEvent* argument that will be passed
+        ignoring) the single :class:`NeoKeyEvent` argument that will be passed
         to the function when it is invoked. Then, either as an argument
-        to the *NeoKey1x4* constructor or by using its **auto_color**
-        property, you inform the *NeoKey1x4* to use this function to
+        to the :class:`NeoKey1x4` constructor or by using its **auto_color**
+        property, you inform the :class:`NeoKey1x4` to use this function to
         set key colors. It will invoke the function on key press and
         key release events, setting the color of the key in question.
 
@@ -539,9 +539,9 @@ class NeoKey1x4:
 
             neokey.auto_color = lambda e: 0xFF0000 if e.pressed else 0
 
-        Another thing *NeoKey1x4* can do for you is blink your keys.
+        Another thing :class:`NeoKey1x4` can do for you is blink your keys.
         For example, to signal an alert condition associated with a
-        key, the **blink** property of that key could be set to *True*.
+        key, the **blink** property of that key could be set to True.
         Each time **read()** is run, it checks to see whether the key
         should change from 'off' to 'on' or vice versa and takes care
         of it.
@@ -552,7 +552,7 @@ class NeoKey1x4:
 
         Finally, similar to **auto_color**, **read()** can execute a
         function every time a key is pressed or released. This
-        can be set in an argument to the *NeoKey1x4* constructor
+        can be set in an argument to the :class:`NeoKey1x4` constructor
         or it can be specified using the **auto_action** property.
 
         Although there is no limitation on uses for this function, a
@@ -585,7 +585,7 @@ class NeoKey1x4:
         functions and managing **blink**, but uses a different approach
         to gathering and returning events.
 
-        :param int timeout: yield *None* if no key activity in 10ths of a second
+        :param int timeout: yield None if no key activity in 10ths of a second
 
         This method queries one NeoKey module at a time. If there are
         events from that module, yields those events back to the caller
@@ -607,7 +607,7 @@ class NeoKey1x4:
             until it detects an event.
 
             To overcome this behavior, use the **timeout** parameter
-            to cause **read_event()** to return *None* whenever the
+            to cause **read_event()** to return None whenever the
             specified time has elapsed without a key event. As with
             **blink**, **timeout** is supported only when the board
             supports **time.monotonic_ns()**.
