@@ -25,11 +25,7 @@ print(f"Memory: Start: alloc={used1} free={free1}")
 
 from alt_neokey.alt_neokey1x4 import NeoKey1x4  # pylint: disable=wrong-import-position
 
-# If you have one module, swap which line is commented.
-# MODULES = 0x30
-MODULES = (0x30, 0x31)
-
-System = namedtuple("System", "name color")
+System = namedtuple("System", ("name", "color"))
 SYSTEMS = (
     System("AM CONTAIMENT", 0x0000FF),
     System("WARP COILS", 0xFF0000),
@@ -38,7 +34,7 @@ SYSTEMS = (
     System("DECOM CHAMBER", 0x7700FF),
     System("MED BAY", 0xFF0077),
     System("HULL PLATING", 0x00FF77),
-    System("PHASE CANNONS", 0xFFFFFF),
+    System("PHASE CANNONS", 0xFF00FF),
 )
 
 
@@ -46,17 +42,23 @@ def my_colors(kev):
     # blink will default to white if the released color is 0
     # so, this time, we'll choose to go dark when pressed.
     # Other than the weird colors for this demo, this looks great!
-    return 0 if kev.pressed else SYSTEMS[kev.key_num].color
+    # Just in case you have more than two modules connected,
+    # defaults to white.
+    if kev.pressed:
+        return 0
+    try:
+        return SYSTEMS[kev.key_num].color
+    except IndexError:
+        return 0xFFFFFF
 
 
 i2c_bus = board.I2C()
 
-# Create a NeoKey object for two NeoKey1x4 modules
-neokey = NeoKey1x4(
+# Create a NeoKey object for all NeoKey1x4 modules
+# on the i2c buss using the class method all().
+neokey = NeoKey1x4.all(
     i2c_bus,
-    addr=MODULES,
     auto_color=my_colors,
-    blink=False,  # use blink selectively (default)
 )
 
 # This time, our automatic action will be to change whether
@@ -68,10 +70,14 @@ def my_action(kev):
     if kev.pressed:
         key = neokey[kev.key_num]  # this is a NeoKey_Key object
         key.blink = not key.blink
+        try:
+            system = SYSTEMS[kev.key_num].name
+        except IndexError:
+            system = f"#{kev.key_num}"
         if key.blink:
-            print(f"ALERT on {SYSTEMS[kev.key_num].name}!")
+            print(f"ALERT on {system}!")
         else:
-            print(f"{SYSTEMS[kev.key_num].name} alert cleared.")
+            print(f"{system} alert cleared.")
 
 
 neokey.auto_action = my_action
