@@ -147,7 +147,7 @@ class NeoKeyKey:
     def pressed(self):
         """Immediate read of this key's state via the I2C bus.
         Read-only property is True if the key is being pressed.
-        Does not invoke or affect **auto_color** or **auto_action**."""
+        Does not invoke or affect :attr:`auto_color` or :attr:`auto_action`."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
@@ -199,16 +199,16 @@ class NeoKey1x4:
     *blinktest* example uses another 3 KB.
 
     Basic usage is one NeoKey module. In that case, supply its I2C address
-    as the **addr** argument.
+    as the :attr:`addr` argument.
 
     To use multiple modules together, supply a list or tuple of I2C addresses
-    as the **addr** argument. Sixteen modules can be supported by selectively
+    as the :attr:`addr` argument. Sixteen modules can be supported by selectively
     solder-bridging the four address selectors to give each board a unique
     address, 0x30 through 0x3F. Key numbers will be assigned to the keys in
     the order of board addresses in the list, first 0-3, second 4-7, ...,
     sixteenth 60-63. (If you accidentally assemble your project with the
     modules out of ascending address order, no worries! Just order them the
-    same way in the **addr** list; the keys will be numbered the way you want.)
+    same way in the :attr:`addr` list; the keys will be numbered the way you want.)
 
     Keys may be referenced by indexing the :class:`NeoKey1x4` instance. Each key is
     represented by a :class:`NeoKeyKey` instance. See the section about that class
@@ -216,28 +216,28 @@ class NeoKey1x4:
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
-    to the :class:`NeoKey1x4` constructor using the **auto_color** parameter. The function
+    to the :class:`NeoKey1x4` constructor using the :attr:`auto_color` parameter. The function
     will be called for each key press and key release event, as detected by
-    the **read()** method. That method will call the function with a single
+    the :meth:`read` method. That method will call the function with a single
     argument, a :class:`NeoKeyEvent`.
 
-    Similarly, to have **read()** run arbitrary code whenever a key is pressed,
-    use the :class:`NeoKey1x4` constructor's **auto_action** parameter. Any return value
-    from the function will be ignored. As with **auto_color**, it will be passed
+    Similarly, to have :meth:`read` run arbitrary code whenever a key is pressed,
+    use the :class:`NeoKey1x4` constructor's :attr:`auto_action` parameter. Any return value
+    from the function will be ignored. As with :attr:`auto_color`, it will be passed
     a single :class:`NeoKeyEvent` argument when invoked.
 
-    The **blink** parameter is provided to initially enable all keys to blink
-    while not being pressed, as sensed by **read()**. Keys may be set
-    individually to blink or not blink using their **blink** property,
-    regardless of the **blink** value passed to the :class:`NeoKey1x4` constructor.
-    The blink feature requires **time.monotonic_ns()**, which is not available
+    The :attr:`blink` parameter is provided to initially enable all keys to blink
+    while not being pressed, as sensed by :meth:`read`. Keys may be set
+    individually to blink or not blink using their :attr:`blink` property,
+    regardless of the :attr:`blink` value passed to the :class:`NeoKey1x4` constructor.
+    The blink feature requires :func:`time.monotonic_ns`, which is not available
     on some boards. In that case, the feature is disabled and attempting
-    to use it will raise a :class:`RuntimeError` exception.
+    to use it will raise a :exc:`RuntimeError` exception.
 
-    .. note:: The **auto_color** function is used to initialize key colors
+    .. note:: The :attr:`auto_color` function is used to initialize key colors
         whenever it is set or changed (except when set to None).
         It is used with blink mode to establish the 'on' color in the on/off
-        cycle. In contrast, the **auto_action** function can be relied upon
+        cycle. In contrast, the :attr:`auto_action` function can be relied upon
         to be called only on key press and key release events.
 
     Any time spent doing anything other than reading keys can detract from
@@ -336,7 +336,7 @@ class NeoKey1x4:
 
         Any other named parameters are passed onto the :class:`NeoKey1x4` constructor.
 
-        Raises :class:`RuntimeError` exception if no modules found."""
+        Raises :exc:`RuntimeError` exception if no modules found."""
 
         my_args = {
             "base": _NEOKEY1X4_BASE_ADDR,
@@ -372,7 +372,7 @@ class NeoKey1x4:
 
     def fill(self, color):
         """Set all keys to the specified color.
-        Useful when setting key colors other than with **auto_color**.
+        Useful when setting key colors other than with :attr:`auto_color`.
 
         :param int color: 24-bit color integer"""
         for pixel in self._pixels:
@@ -394,7 +394,7 @@ class NeoKey1x4:
         """Automatic color management function. Function is invoked on
         key press or release and is passed a single :class:`NeoKeyEvent` as argument.
         The function must return a 24-bit RGB color integer.
-        Use None to remove a previously set **auto_color** function.
+        Use None to remove a previously set :attr:`auto_color` function.
         All keys are immediately set to their 'released' color whenever
         this parameter is set to a value other than None.
 
@@ -450,8 +450,8 @@ class NeoKey1x4:
         return do_blink
 
     def _blink_key(self, key_num, state):
-        """If state True, turn on color using **auto_color**, preferring released color,
-        then pressed color. If both colors are 0 (off), or if no **auto_color**, use white."""
+        """If state True, turn on color using :attr:`auto_color`, preferring released color,
+        then pressed color. If both colors are 0 (off), or if no :attr:`auto_color`, use white."""
         if not state:
             color = 0  # off is always off
         elif self._auto_color:
@@ -464,8 +464,8 @@ class NeoKey1x4:
         self._keys[key_num].color = color
 
     def _read_module(self, index, seesaw, do_blink):
-        """Common code for **read()** and **read_event()**.
-        Reads one module, executes **auto_** functions. Blinks.
+        """Common code for :meth:`read` and :meth:`read_event`.
+        Reads one module, executes :attr:`auto_` functions. Blinks.
         Returns event list."""
         events = []
         previous = self._key_bits[index]
@@ -493,19 +493,19 @@ class NeoKey1x4:
         return events
 
     def read(self):
-        """At the most basic level, **read()** queries all keys via
+        """At the most basic level, :meth:`read` queries all keys via
         the I2C bus. It compares the states of the keys to the previous
         time it was run. From that comparison, it generates an event
         list. Each event in that list corresponds to a key press or
         key release. This is not the same as the current state of a
         key, as a key that was neither pressed nor released since the
-        last **read()** will not have an event in the list. (To get
-        the current state of a key, use its **pressed** property.)
+        last :meth:`read` will not have an event in the list. (To get
+        the current state of a key, use its :attr:`pressed` property.)
         Each event in the list is a :class:`NeoKeyEvent` instance. The return
         value is this list.
 
         The following code snippet, adapted from the *simpletest* example,
-        demonstrates responding to the event list returned by **read()**.
+        demonstrates responding to the event list returned by :meth:`read`.
 
         .. sourcecode:: python
 
@@ -526,13 +526,13 @@ class NeoKey1x4:
         Instead, define a function that returns a color based on (or
         ignoring) the single :class:`NeoKeyEvent` argument that will be passed
         to the function when it is invoked. Then, either as an argument
-        to the :class:`NeoKey1x4` constructor or by using its **auto_color**
+        to the :class:`NeoKey1x4` constructor or by using its :attr:`auto_color`
         property, you inform the :class:`NeoKey1x4` to use this function to
         set key colors. It will invoke the function on key press and
         key release events, setting the color of the key in question.
 
         This function in many cases is so simple that it can be expressed
-        as a *lambda*, as in the code snippet below, which sets the
+        as a :obj:`lambda`, as in the code snippet below, which sets the
         key color to red when pressed and off when released.
 
         .. sourcecode:: python
@@ -541,8 +541,8 @@ class NeoKey1x4:
 
         Another thing :class:`NeoKey1x4` can do for you is blink your keys.
         For example, to signal an alert condition associated with a
-        key, the **blink** property of that key could be set to True.
-        Each time **read()** is run, it checks to see whether the key
+        key, the :attr:`blink` property of that key could be set to True.
+        Each time :meth:`read` is run, it checks to see whether the key
         should change from 'off' to 'on' or vice versa and takes care
         of it.
 
@@ -550,16 +550,16 @@ class NeoKey1x4:
 
             neokey[2].blink = True # sets key 2 blinking
 
-        Finally, similar to **auto_color**, **read()** can execute a
+        Finally, similar to :attr:`auto_color`, :meth:`read` can execute a
         function every time a key is pressed or released. This
         can be set in an argument to the :class:`NeoKey1x4` constructor
-        or it can be specified using the **auto_action** property.
+        or it can be specified using the :attr:`auto_action` property.
 
         Although there is no limitation on uses for this function, a
         suggestion is to use it for other housekeeping functions,
         such as key-clicks, haptic feedback, key logging, etc. This
         would allow you to keep such code separate from the main thrust
-        of your program. Any return value from the **auto_action**
+        of your program. Any return value from the :attr:`auto_action`
         function will be ignored.
 
         .. sourcecode:: python
@@ -581,8 +581,8 @@ class NeoKey1x4:
         return events
 
     def read_event(self, *, timeout=0):
-        """Similar to **read()** in its calling of **auto_**
-        functions and managing **blink**, but uses a different approach
+        """Similar to :meth:`read` in its calling of :attr:`auto_`
+        functions and managing :attr:`blink`, but uses a different approach
         to gathering and returning events.
 
         :param int timeout: yield None if no key activity in 10ths of a second
@@ -593,32 +593,32 @@ class NeoKey1x4:
         off. It continues to the next module, starting over with the
         first after the last, looping forever.
 
-        The principal advantage of **read_event()** over **read()**
-        is latency fairness. With **read()**, the first NeoKey module
-        gets quicker response than the last because **auto_color**,
-        **auto_action** and **blink** are processed in module
+        The principal advantage of :meth:`read_event` over :meth:`read`
+        is latency fairness. With :meth:`read`, the first NeoKey module
+        gets quicker response than the last because :attr:`auto_color`,
+        :attr:`auto_action` and :attr:`blink` are processed in module
         and key order. (This effect also could be present in your
         main program, if it processes the event list in order.)
-        With **read_event()**, latency is shared evenly because it
+        With :meth:`read_event`, latency is shared evenly because it
         always picks up from where it left off.
 
         .. note:: A possibly critical disadvantage of using
-            **read_event()** is that it does not return to the caller
+            :meth:`read_event` is that it does not return to the caller
             until it detects an event.
 
-            To overcome this behavior, use the **timeout** parameter
-            to cause **read_event()** to return None whenever the
+            To overcome this behavior, use the :attr:`timeout` parameter
+            to cause :meth:`read_event` to return None whenever the
             specified time has elapsed without a key event. As with
-            **blink**, **timeout** is supported only when the board
-            supports **time.monotonic_ns()**.
+            :attr:`blink`, :attr:`timeout` is supported only when the board
+            supports :func:`time.monotonic_ns`.
 
         Depending on your application, latency differences might be
         insignificant or unimportant. In those cases, you probably
-        should use **read()**, as it allows for more flexibility in
-        the main program, given that the **timeout** feature is not
+        should use :meth:`read`, as it allows for more flexibility in
+        the main program, given that the :attr:`timeout` feature is not
         universally supported.
 
-        Here is an example of using **read_event()** with a timeout
+        Here is an example of using :meth:`read_event` with a timeout
         of three tenths of a second.
 
         .. sourcecode:: python
