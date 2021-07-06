@@ -324,6 +324,39 @@ class NeoKey1x4:
         self.auto_color = auto_color
         self.auto_action = auto_action
 
+    @classmethod
+    def all(cls, i2c_bus, **kargs):
+        """Find all *NeoKey1x4* devices on the bus and create a *NeoKey1x4*
+        instance using all of them, in i2c address order.
+
+        :param int base: default (and lowest) i2c address
+        :param int last: highest i2c address
+
+        Any other named parameters are passed onto the *NeoKey1x4 constructor."""
+
+        my_args = {
+            "base": _NEOKEY1X4_BASE_ADDR,
+            "last": _NEOKEY1X4_LAST_ADDR,
+        }
+        for name in my_args:
+            try:
+                my_args[name] = kargs[name]
+            except KeyError:
+                pass
+            else:
+                del kargs[name]
+
+        addr = []
+        while i2c_bus.try_lock():
+            pass
+        for address in i2c_bus.scan():
+            if my_args["base"] <= address <= my_args["last"]:
+                addr.append(address)
+        i2c_bus.unlock()
+        if not addr:
+            raise RuntimeError(f"no {cls} devices found")
+        return cls(i2c_bus, addr=addr, **kargs)
+
     def __getitem__(self, key_num):
         return self._keys[key_num]
 
