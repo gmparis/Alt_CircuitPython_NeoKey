@@ -30,26 +30,36 @@ Implementation Notes
 __version__ = "0.0.0-auto.0"
 __repo__ = "https://github.com/gmparis/Alt_CircuitPython_NeoKey.git"
 
+from collections import namedtuple
+from micropython import const
+from adafruit_seesaw.seesaw import Seesaw
+from adafruit_seesaw.neopixel import NeoPixel, GRB
+
 try:
-    from time import monotonic_ns
+    from time import monotonic_ns  # pylint: disable=wrong-import-position
 except ImportError:
-
-    def _time_ops_check(fatal=True):
-        if fatal:
-            raise RuntimeError("feature requires monotonic_ns")
-        return False
-
-
+    _HAS_MNS = False
 else:
+    try:
+        monotonic_ns()
+    except NotImplementedError:
+        _HAS_MNS = False
+    else:
+        _HAS_MNS = True
+
+if _HAS_MNS:
 
     def _time_ops_check(ignored=True):  # pylint: disable=unused-argument
         return True
 
 
-from collections import namedtuple
-from micropython import const
-from adafruit_seesaw.seesaw import Seesaw
-from adafruit_seesaw.neopixel import NeoPixel, GRB
+else:
+
+    def _time_ops_check(fatal=True):
+        if fatal:
+            raise RuntimeError("feature requires long integers")
+        return False
+
 
 _NEOKEY1X4_BASE_ADDR = const(0x30)
 _NEOKEY1X4_LAST_ADDR = const(_NEOKEY1X4_BASE_ADDR | 0x0F)  # 4 addr bridges
