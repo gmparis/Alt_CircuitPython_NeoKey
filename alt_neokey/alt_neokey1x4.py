@@ -332,7 +332,7 @@ class NeoKey1x4:
         :param int base: default (and lowest) i2c address
         :param int last: highest i2c address
 
-        Any other named parameters are passed onto the *NeoKey1x4 constructor."""
+        Any other named parameters are passed onto the *NeoKey1x4* constructor."""
 
         my_args = {
             "base": _NEOKEY1X4_BASE_ADDR,
