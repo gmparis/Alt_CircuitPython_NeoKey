@@ -183,7 +183,7 @@ def _bits_to_keys(seesaw_num, bits):
 class NeoKey1x4:
     """Alternative API for Adafruit's I2C keypad with RGB LEDs.
 
-    :param ~busio.I2C i2c_bus: Bus the NeoKey is connected to
+    :param ~busio.I2C i2c_bus: bus the NeoKey is connected to
     :param int addr: I2C address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
     :param function auto_color: set colors when keys pressed/released
@@ -232,7 +232,7 @@ class NeoKey1x4:
     regardless of the **blink** value passed to the *NeoKey1x4* constructor.
     The blink feature requires **time.monotonic_ns()**, which is not available
     on some boards. In that case, the feature is disabled and attempting
-    to use it will raise a *RuntimeError* exception.
+    to use it will raise a :class:`RuntimeError` exception.
 
     .. note:: The **auto_color** function is used to initialize key colors
         whenever it is set or changed (except when set to *None*).
@@ -327,12 +327,16 @@ class NeoKey1x4:
     @classmethod
     def all(cls, i2c_bus, **kargs):
         """Find all *NeoKey1x4* devices on the bus and create a *NeoKey1x4*
-        instance using all of them, in i2c address order.
+        instance using all of them, in ascending i2c address order. Returns
+        the new instance.
 
-        :param int base: default (and lowest) i2c address
-        :param int last: highest i2c address
+        :param ~busio.I2C i2c_bus: bus connecting the *NeoKey1x4* module(s)
+        :param int base: lowest i2c address (default 0x30)
+        :param int last: highest i2c address (default 0x3F)
 
-        Any other named parameters are passed onto the *NeoKey1x4* constructor."""
+        Any other named parameters are passed onto the *NeoKey1x4* constructor.
+
+        Raises :class:`RuntimeError` exception if no modules found."""
 
         my_args = {
             "base": _NEOKEY1X4_BASE_ADDR,
