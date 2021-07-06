@@ -5,7 +5,7 @@
 `alt_neokey.alt_neokey1x4`
 ================================================================================
 
-Alternative CircuitPython API for NeoKey I2C Keypad
+Alternative CircuitPython API for NeoKey i2c Keypad
 
 
 * Author(s): Greg Paris
@@ -15,7 +15,7 @@ Implementation Notes
 
 **Hardware:**
 
-* `NeoKey 1x4 QT I2C <https://www.adafruit.com/product/4980>`_
+* `NeoKey 1x4 QT i2c <https://www.adafruit.com/product/4980>`_
 
 **Software and Dependencies:**
 
@@ -145,7 +145,7 @@ class NeoKeyKey:
 
     @property
     def pressed(self):
-        """Immediate read of this key's state via the I2C bus.
+        """Immediate read of this key's state via the i2c bus.
         Read-only property is True if the key is being pressed.
         Does not invoke or affect :attr:`auto_color` or :attr:`auto_action`."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
@@ -155,7 +155,7 @@ class NeoKeyKey:
     @property
     def color(self):
         """Read-write integer property representing the key's pixel color.
-        Reads and writes are done over the I2C bus."""
+        Reads and writes are done over the i2c bus."""
         return self._pixel[self._key_num]
 
     @color.setter
@@ -181,10 +181,10 @@ def _bits_to_keys(seesaw_num, bits):
 
 
 class NeoKey1x4:
-    """Alternative API for Adafruit's I2C keypad with RGB LEDs.
+    """Alternative API for Adafruit's i2c keypad with RGB LEDs.
 
-    :param ~busio.I2C i2c_bus: bus the NeoKey is connected to
-    :param int addr: I2C address (or list of addresses) of NeoKey 1x4 module(s)
+    :param ~busio.i2c i2c_bus: bus the NeoKey is connected to
+    :param int addr: i2c address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
     :param function auto_color: set colors when keys pressed/released
     :param function auto_action: run when keys pressed/released
@@ -198,10 +198,10 @@ class NeoKey1x4:
     this alternative uses about 8 KB more memory. The all-bells-and-whistles
     *blinktest* example uses another 3 KB.
 
-    Basic usage is one NeoKey module. In that case, supply its I2C address
+    Basic usage is one NeoKey module. In that case, supply its i2c address
     as the :attr:`addr` argument.
 
-    To use multiple modules together, supply a list or tuple of I2C addresses
+    To use multiple modules together, supply a list or tuple of i2c addresses
     as the :attr:`addr` argument. Sixteen modules can be supported by selectively
     solder-bridging the four address selectors to give each board a unique
     address, 0x30 through 0x3F. Key numbers will be assigned to the keys in
@@ -236,7 +236,7 @@ class NeoKey1x4:
 
     .. note:: The :attr:`auto_color` function is used to initialize key colors
         whenever it is set or changed (except when set to None).
-        It is used with blink mode to establish the 'on' color in the on/off
+        It is used with blink mode to establish the :term:`on` color in the on/off
         cycle. In contrast, the :attr:`auto_action` function can be relied upon
         to be called only on key press and key release events.
 
@@ -251,7 +251,7 @@ class NeoKey1x4:
 
         import board
         from alt_neokey.alt_neokey1x4 import NeoKey1x4
-        i2c = board.I2C()
+        i2c = board.i2c()
         neokey = NeoKey1x4(
             i2c,
             auto_color=lambda e: 0xFFFFFF if e.pressed else 0
@@ -268,7 +268,7 @@ class NeoKey1x4:
     blink_on = 14
 
     def _blink_clock(self):
-        """True when blink is in 'on' state."""
+        """True when blink is in :term:`on` state."""
         return (monotonic_ns() // 100_000_000) % self.blink_period < self.blink_on
 
     def __init__(
@@ -283,7 +283,7 @@ class NeoKey1x4:
     ):
         try:
             if len(set(addr)) < len(addr):
-                raise RuntimeError("duplicates in I2C address list")
+                raise RuntimeError("duplicates in i2c address list")
         except TypeError:
             addr = (addr,)
         if blink:
@@ -298,7 +298,7 @@ class NeoKey1x4:
                 or i2c_addr < _NEOKEY1X4_BASE_ADDR
                 or i2c_addr > _NEOKEY1X4_LAST_ADDR
             ):
-                raise RuntimeError(f"'{i2c_addr}' is not a valid I2C address")
+                raise RuntimeError(f"'{i2c_addr}' is not a valid i2c address")
             # supplied order of i2c addresses determines offsets
             ss_mod = Seesaw(i2c_bus, i2c_addr)
             seesaws.append(ss_mod)
@@ -330,7 +330,7 @@ class NeoKey1x4:
         instance using all of them, in ascending i2c address order. Returns
         the new instance.
 
-        :param ~busio.I2C i2c_bus: bus connecting the :class:`NeoKey1x4` module(s)
+        :param ~busio.i2c i2c_bus: bus connecting the :class:`NeoKey1x4` module(s)
         :param int base: lowest i2c address (default 0x30)
         :param int last: highest i2c address (default 0x3F)
 
@@ -395,7 +395,7 @@ class NeoKey1x4:
         key press or release and is passed a single :class:`NeoKeyEvent` as argument.
         The function must return a 24-bit RGB color integer.
         Use None to remove a previously set :attr:`auto_color` function.
-        All keys are immediately set to their 'released' color whenever
+        All keys are immediately set to their :term:`released` color whenever
         this parameter is set to a value other than None.
 
         The code snippet below, taken from one of the example programs,
@@ -451,7 +451,8 @@ class NeoKey1x4:
 
     def _blink_key(self, key_num, state):
         """If state True, turn on color using :attr:`auto_color`, preferring released color,
-        then pressed color. If both colors are 0 (off), or if no :attr:`auto_color`, use white."""
+        then pressed color. If both colors are 0 (:term:`off`), or if no :attr:`auto_color`,
+        use white."""
         if not state:
             color = 0  # off is always off
         elif self._auto_color:
@@ -494,7 +495,7 @@ class NeoKey1x4:
 
     def read(self):
         """At the most basic level, :meth:`read` queries all keys via
-        the I2C bus. It compares the states of the keys to the previous
+        the i2c bus. It compares the states of the keys to the previous
         time it was run. From that comparison, it generates an event
         list. Each event in that list corresponds to a key press or
         key release. This is not the same as the current state of a
@@ -533,7 +534,7 @@ class NeoKey1x4:
 
         This function in many cases is so simple that it can be expressed
         as a :obj:`lambda`, as in the code snippet below, which sets the
-        key color to red when pressed and off when released.
+        key color to red when pressed and :term:`off` when released.
 
         .. sourcecode:: python
 
@@ -543,7 +544,7 @@ class NeoKey1x4:
         For example, to signal an alert condition associated with a
         key, the :attr:`blink` property of that key could be set to True.
         Each time :meth:`read` is run, it checks to see whether the key
-        should change from 'off' to 'on' or vice versa and takes care
+        should change from :term:`off` to :term:`on` or vice versa and takes care
         of it.
 
         .. sourcecode:: python
