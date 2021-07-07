@@ -185,10 +185,10 @@ class NeoKey1x4:
     """Alternative API for Adafruit's i2c keypad with RGB LEDs.
 
     :param ~busio.i2c i2c_bus: bus the NeoKey 1x4 is connected to
-    :param int or list(int) addr: i2c address or list of addresses of NeoKey 1x4 module(s)
+    :param int addr: i2c address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
-    :param function or None auto_color: set colors when keys pressed/released
-    :param function or None auto_action: run when keys pressed/released
+    :param function auto_color: set colors when keys pressed/released
+    :param function auto_action: run when keys pressed/released
     :param bool blink: blink all keys when they are not pressed
     :raises RuntimeError: if unsupported features are used
     :raises ValueError: for incorrect i2c addresses
