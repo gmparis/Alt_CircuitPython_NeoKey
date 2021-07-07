@@ -192,7 +192,7 @@ class NeoKey1x4:
     :param bool blink: blink all keys when they are not pressed
     :raises RuntimeError: if unsupported features are used
     :raises ValueError: for incorrect i2c addresses
-    :raises TypeError: if auto_color and auto_action not function
+    :raises TypeError: if auto_color or auto_action is not a function
 
     The intent of this alternative API is to reduce the amount of user
     code necessary to manage key colors and respond to key-press events.
