@@ -185,10 +185,10 @@ class NeoKey1x4:
     """Alternative API for Adafruit's i2c keypad with RGB LEDs.
 
     :param ~busio.i2c i2c_bus: bus the NeoKey 1x4 is connected to
-    :param int addr: i2c address (or list of addresses) of NeoKey 1x4 module(s)
+    :param int or list(int) addr: i2c address or list of addresses of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
-    :param function auto_color: set colors when keys pressed/released
-    :param function auto_action: run when keys pressed/released
+    :param function or None auto_color: set colors when keys pressed/released
+    :param function or None auto_action: run when keys pressed/released
     :param bool blink: blink all keys when they are not pressed
     :raises RuntimeError: if unsupported features are used
     :raises ValueError: for incorrect i2c addresses
@@ -218,7 +218,7 @@ class NeoKey1x4:
     represented by a :class:`NeoKeyKey` instance.
 
     To dynamically manipulate key colors without coding it into your main
-    loop, create a function that returns a color (24-bit RGB) and pass it
+    loop, define a function that returns a color (24-bit RGB) and pass it
     to the :class:`NeoKey1x4` constructor using the :attr:`auto_color` parameter. The function
     will be called for each key press and key release event, as detected by
     the :meth:`read` method. That method will call the function with a single
@@ -595,7 +595,7 @@ class NeoKey1x4:
         but uses a different approach to gathering and returning events.
 
         :param int timeout: yield None if no key activity in 10ths of a second
-        :rtype: NeoKeyEvent
+        :rtype: NeoKeyEvent or None
         :raises ValueError: for negative timeout
 
         This method queries one NeoKey 1x4 module at a time. If there are
