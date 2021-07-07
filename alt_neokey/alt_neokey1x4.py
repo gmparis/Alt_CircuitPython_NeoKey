@@ -236,7 +236,7 @@ class NeoKey1x4:
 
     .. note:: The :attr:`auto_color` function is used to initialize key colors
         whenever it is set or changed (except when set to None).
-        It is used with blink mode to establish the :term:`on` color in the on/off
+        It is used with blink mode to establish the 'on' color in the on/off
         cycle. In contrast, the :attr:`auto_action` function can be relied upon
         to be called only on key press and key release events.
 
@@ -268,7 +268,7 @@ class NeoKey1x4:
     blink_on = 14
 
     def _blink_clock(self):
-        """True when blink is in :term:`on` state."""
+        """True when blink is in 'on' state."""
         return (monotonic_ns() // 100_000_000) % self.blink_period < self.blink_on
 
     def __init__(
@@ -395,7 +395,7 @@ class NeoKey1x4:
         key press or release and is passed a single :class:`NeoKeyEvent` as argument.
         The function must return a 24-bit RGB color integer.
         Use None to remove a previously set :attr:`auto_color` function.
-        All keys are immediately set to their :term:`released` color whenever
+        All keys are immediately set to their 'released' color whenever
         this parameter is set to a value other than None.
 
         The code snippet below, taken from one of the example programs,
@@ -451,7 +451,7 @@ class NeoKey1x4:
 
     def _blink_key(self, key_num, state):
         """If state True, turn on color using :attr:`auto_color`, preferring released color,
-        then pressed color. If both colors are 0 (:term:`off`), or if no :attr:`auto_color`,
+        then pressed color. If both colors are 0 ('off'), or if no :attr:`auto_color`,
         use white."""
         if not state:
             color = 0  # off is always off
@@ -534,7 +534,7 @@ class NeoKey1x4:
 
         This function in many cases is so simple that it can be expressed
         as a :obj:`lambda`, as in the code snippet below, which sets the
-        key color to red when pressed and :term:`off` when released.
+        key color to red when pressed and 'off' when released.
 
         .. sourcecode:: python
 
@@ -544,7 +544,7 @@ class NeoKey1x4:
         For example, to signal an alert condition associated with a
         key, the :attr:`blink` property of that key could be set to True.
         Each time :meth:`read` is run, it checks to see whether the key
-        should change from :term:`off` to :term:`on` or vice versa and takes care
+        should change from 'off' to 'on' or vice versa and takes care
         of it.
 
         .. sourcecode:: python
