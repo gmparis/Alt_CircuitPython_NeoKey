@@ -5,7 +5,7 @@
 `alt_neokey.alt_neokey1x4`
 ================================================================================
 
-Alternative CircuitPython API for NeoKey i2c Keypad
+Alternative CircuitPython API for NeoKey 1x4 i2c Keypad
 
 
 * Author(s): Greg Paris
@@ -87,14 +87,14 @@ NeoKeyEvent = namedtuple("NeoKeyEvent", "key_num pressed".split())
 class NeoKeyKey:
     """A single key and pixel pairing.
 
-    :param ~Seesaw.seesaw seesaw: NeoKey Seesaw
-    :param ~Seesaw.neopixel pixel: NeoKey NeoPixel
+    :param ~Seesaw.seesaw seesaw: NeoKey 1x4 Seesaw
+    :param ~Seesaw.neopixel pixel: NeoKey 1x4 NeoPixel
     :param int key_num: key number assigned by :class:`NeoKey1x4`
 
     The constructor for this class is not intended to be invoked
     by anything other than :class:`NeoKey1x4`. One :class`NeoKeyKey` instance
     is created by :class:`NeoKey1x4` for each key. Keys are numbered 0-3
-    on the first NeoKey module. 4-7 on the second, etc.
+    on the first NeoKey 1x4 module. 4-7 on the second, etc.
 
     These instances can be referenced by indexing a :class:`NeoKey1x4`
     object, as shown in the examples below.
@@ -147,7 +147,8 @@ class NeoKeyKey:
     def pressed(self):
         """Immediate read of this key's state via the i2c bus.
         Read-only property is True if the key is being pressed.
-        Does not invoke or affect :attr:`auto_color` or :attr:`auto_action`."""
+        Does not invoke or affect :attr:`~NeoKey1x4.auto_color` or
+        :attr:`~NeoKey1x4.auto_action`."""
         key_bits = self._seesaw.digital_read_bulk(_NEOKEY1X4_KEYMASK)
         key_bits ^= _NEOKEY1X4_KEYMASK  # invert
         return (key_bits & _NEOKEY1X4_KEYS[self._key_num]) != 0
@@ -183,7 +184,7 @@ def _bits_to_keys(seesaw_num, bits):
 class NeoKey1x4:
     """Alternative API for Adafruit's i2c keypad with RGB LEDs.
 
-    :param ~busio.i2c i2c_bus: bus the NeoKey is connected to
+    :param ~busio.i2c i2c_bus: bus the NeoKey 1x4 is connected to
     :param int addr: i2c address (or list of addresses) of NeoKey 1x4 module(s)
     :param float brightness: RGB LED intensity
     :param function auto_color: set colors when keys pressed/released
@@ -192,13 +193,13 @@ class NeoKey1x4:
 
     The intent of this alternative API is to reduce the amount of user
     code necessary to manage key colors and respond to key-press events.
-    It also simplifies the task of managing more than one NeoKey module
+    It also simplifies the task of managing more than one NeoKey 1x4 module
     simultaneously. The cost is that this library uses more memory than
     the standard does. Comparing *simpletest* examples from the two libraries,
     this alternative uses about 8 KB more memory. The all-bells-and-whistles
     *blinktest* example uses another 3 KB.
 
-    Basic usage is one NeoKey module. In that case, supply its i2c address
+    Basic usage is one NeoKey 1x4 module. In that case, supply its i2c address
     as the :attr:`addr` argument.
 
     To use multiple modules together, supply a list or tuple of i2c addresses
@@ -211,8 +212,7 @@ class NeoKey1x4:
     same way in the :attr:`addr` list; the keys will be numbered the way you want.)
 
     Keys may be referenced by indexing the :class:`NeoKey1x4` instance. Each key is
-    represented by a :class:`NeoKeyKey` instance. See the section about that class
-    for its attributes.
+    represented by a :class:`NeoKeyKey` instance.
 
     To dynamically manipulate key colors without coding it into your main
     loop, create a function that returns a color (24-bit RGB) and pass it
@@ -228,7 +228,7 @@ class NeoKey1x4:
 
     The :attr:`blink` parameter is provided to initially enable all keys to blink
     while not being pressed, as sensed by :meth:`read`. Keys may be set
-    individually to blink or not blink using their :attr:`blink` property,
+    individually to blink or not blink using their :attr:`~NeoKeyKey.blink` property,
     regardless of the :attr:`blink` value passed to the :class:`NeoKey1x4` constructor.
     The blink feature requires :func:`time.monotonic_ns`, which is not available
     on some boards. In that case, the feature is disabled and attempting
@@ -326,11 +326,11 @@ class NeoKey1x4:
 
     @classmethod
     def all(cls, i2c_bus, **kargs):
-        """Find all :class:`NeoKey1x4` devices on the bus and create a :class:`NeoKey1x4`
+        """Find all NeoKey 1x4 devices on the bus and create a :class:`NeoKey1x4`
         instance using all of them, in ascending i2c address order. Returns
         the new instance.
 
-        :param ~busio.i2c i2c_bus: bus connecting the :class:`NeoKey1x4` module(s)
+        :param ~busio.i2c i2c_bus: bus connecting the NeoKey 1x4 module(s)
         :param int base: lowest i2c address (default 0x30)
         :param int last: highest i2c address (default 0x3F)
 
@@ -380,7 +380,7 @@ class NeoKey1x4:
 
     @property
     def brightness(self):
-        """Float brightness value shared by all NeoKey LEDs."""
+        """Float value of brightness shared by all NeoKey 1x4 LEDs."""
         return self._brightness
 
     @brightness.setter
@@ -466,8 +466,8 @@ class NeoKey1x4:
 
     def _read_module(self, index, seesaw, do_blink):
         """Common code for :meth:`read` and :meth:`read_event`.
-        Reads one module, executes :attr:`auto_` functions. Blinks.
-        Returns event list."""
+        Reads one module, executes :attr:`auto_color` and :attr:`auto_action`
+        functions. Blinks. Returns list of :class:`NeoKeyEvent` events."""
         events = []
         previous = self._key_bits[index]
         # due to pull-ups, pressing a key sets its bit to 0
@@ -518,7 +518,7 @@ class NeoKey1x4:
                     else:
                         print(f"key {event.key_num} released")
 
-        The NeoKey module has an RGB LED under each key. Many uses would
+        The NeoKey 1x4 module has an RGB LED under each key. Many uses would
         have the keys change colors when keys are pressed and released.
         This can be achieved in your main program, but cluttering it up
         with key-color management will make it harder to see
@@ -542,7 +542,7 @@ class NeoKey1x4:
 
         Another thing :class:`NeoKey1x4` can do for you is blink your keys.
         For example, to signal an alert condition associated with a
-        key, the :attr:`blink` property of that key could be set to True.
+        key, the :attr:`~NeoKeyKey.blink` property of that key could be set to True.
         Each time :meth:`read` is run, it checks to see whether the key
         should change from 'off' to 'on' or vice versa and takes care
         of it.
@@ -582,22 +582,22 @@ class NeoKey1x4:
         return events
 
     def read_event(self, *, timeout=0):
-        """Similar to :meth:`read` in its calling of :attr:`auto_`
-        functions and managing :attr:`blink`, but uses a different approach
-        to gathering and returning events.
+        """Similar to :meth:`read` in its calling of :attr:`auto_color`
+        and :attr:`auto_action` functions and managing :attr:`blink`,
+        but uses a different approach to gathering and returning events.
 
         :param int timeout: yield None if no key activity in 10ths of a second
 
-        This method queries one NeoKey module at a time. If there are
+        This method queries one NeoKey 1x4 module at a time. If there are
         events from that module, yields those events back to the caller
         *one event at a time*. On the next call, it starts where it left
         off. It continues to the next module, starting over with the
         first after the last, looping forever.
 
         The principal advantage of :meth:`read_event` over :meth:`read`
-        is latency fairness. With :meth:`read`, the first NeoKey module
+        is latency fairness. With :meth:`read`, the first NeoKey 1x4 module
         gets quicker response than the last because :attr:`auto_color`,
-        :attr:`auto_action` and :attr:`blink` are processed in module
+        :attr:`auto_action` and :attr:`~NeoKeyKey.blink` are processed in module
         and key order. (This effect also could be present in your
         main program, if it processes the event list in order.)
         With :meth:`read_event`, latency is shared evenly because it
