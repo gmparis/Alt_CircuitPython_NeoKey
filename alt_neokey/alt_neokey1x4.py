@@ -190,6 +190,9 @@ class NeoKey1x4:
     :param function auto_color: set colors when keys pressed/released
     :param function auto_action: run when keys pressed/released
     :param bool blink: blink all keys when they are not pressed
+    :raises RuntimeError: if unsupported features are used
+    :raises ValueError: for incorrect i2c addresses
+    :raises TypeError: if auto_color and auto_action not function
 
     The intent of this alternative API is to reduce the amount of user
     code necessary to manage key colors and respond to key-press events.
@@ -283,7 +286,7 @@ class NeoKey1x4:
     ):
         try:
             if len(set(addr)) < len(addr):
-                raise RuntimeError("duplicates in i2c address list")
+                raise ValueError("duplicates in i2c address list")
         except TypeError:
             addr = (addr,)
         if blink:
@@ -298,7 +301,7 @@ class NeoKey1x4:
                 or i2c_addr < _NEOKEY1X4_BASE_ADDR
                 or i2c_addr > _NEOKEY1X4_LAST_ADDR
             ):
-                raise RuntimeError(f"'{i2c_addr}' is not a valid i2c address")
+                raise ValueError(f"'{i2c_addr}' is not a valid i2c address")
             # supplied order of i2c addresses determines offsets
             ss_mod = Seesaw(i2c_bus, i2c_addr)
             seesaws.append(ss_mod)
@@ -333,10 +336,11 @@ class NeoKey1x4:
         :param ~busio.i2c i2c_bus: bus connecting the NeoKey 1x4 module(s)
         :param int base: lowest i2c address (default 0x30)
         :param int last: highest i2c address (default 0x3F)
+        :rtype: NeoKey1x4
+        :raises RuntimeError: if no NeoKey 1x4 modules found.
 
         Any other named parameters are passed onto the :class:`NeoKey1x4` constructor.
-
-        Raises :exc:`RuntimeError` exception if no modules found."""
+        """
 
         my_args = {
             "base": _NEOKEY1X4_BASE_ADDR,
@@ -495,7 +499,11 @@ class NeoKey1x4:
 
     def read(self):
         """At the most basic level, :meth:`read` queries all keys via
-        the i2c bus. It compares the states of the keys to the previous
+        the i2c bus.
+
+        :rtype: list(NeoKeyEvent)
+
+        :meth:`read` compares the states of the keys to the previous
         time it was run. From that comparison, it generates an event
         list. Each event in that list corresponds to a key press or
         key release. This is not the same as the current state of a
@@ -587,6 +595,8 @@ class NeoKey1x4:
         but uses a different approach to gathering and returning events.
 
         :param int timeout: yield None if no key activity in 10ths of a second
+        :rtype: NeoKeyEvent
+        :raises ValueError: for negative timeout
 
         This method queries one NeoKey 1x4 module at a time. If there are
         events from that module, yields those events back to the caller
